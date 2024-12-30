@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::domain::error::DomainResult;
@@ -18,19 +17,22 @@ impl SignUrlService for SignUrlServiceImpl {
         &self,
         param: GenerateSignUrlParam,
     ) -> DomainResult<GenerateSignUrlResult> {
+        println!("request is here in sign url service");
+
         let token = self
             .token_service
             .generate_token(GenerateTokenParam {
                 expire_time: 60 * 60 * 24,
-                metadata: HashMap::from([
-                    ("image_name".to_string(), param.image_name),
-                    ("image_ext".to_string(), param.image_ext),
-                    ("image_size".to_string(), param.image_size.to_string()),
-                ]),
+                image_name: param.image_name,
+                image_ext: param.image_ext,
+                image_size: param.image_size,
             })
             .await?;
 
-        let url = format!("{}/upload?token={}", "self.config.base_url", token.token);
+        let url = format!(
+            "{}/opt/upload?token={}",
+            "self.config.base_url", token.token
+        );
         DomainResult::Ok(GenerateSignUrlResult { url })
     }
 }

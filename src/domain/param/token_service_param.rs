@@ -1,10 +1,13 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
+use crate::domain::entity::image::Image;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GenerateTokenParam {
     pub expire_time: u64,
-    pub metadata: HashMap<String, String>,
+    pub image_name: String,
+    pub image_ext: String,
+    pub image_size: usize,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -15,6 +18,7 @@ pub struct GenerateTokenResult {
 #[derive(Clone, Serialize, Deserialize)]
 pub struct VerifyTokenParam {
     pub token: String,
+    pub image: Image,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

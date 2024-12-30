@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct GenerateSignUrlParam {
     pub image_name: String,
     pub image_ext: String,
-    pub image_size: u64,
+    pub image_size: usize,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

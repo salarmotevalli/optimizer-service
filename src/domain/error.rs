@@ -21,4 +21,6 @@ impl std::fmt::Display for DomainErr {
 #[derive(Debug)]
 pub enum ErrKind {
     UnExpectedErr,
+    UnAuthorizedErr,
+    UnprocessableErr,
 }

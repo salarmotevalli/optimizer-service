@@ -1,4 +1,3 @@
-
 use crate::domain::error::DomainResult;
 use crate::domain::param::image_service_param::*;
 use crate::domain::service::ImageService;
@@ -10,12 +9,6 @@ pub struct ImageServiceImpl {}
 #[async_trait]
 impl ImageService for ImageServiceImpl {
     async fn opt_img(&self, param: OptImgParam) -> DomainResult<OptImgResult> {
-        // download
-
-        // resize
-
-        //reformat
-
         DomainResult::Ok(OptImgResult { img: param.image })
     }
 
