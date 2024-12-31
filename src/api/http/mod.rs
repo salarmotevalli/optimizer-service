@@ -7,12 +7,13 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::{
-    app_config::Config, domain::{
+    container::Container,
+    domain::{
         entity,
         error::{DomainErr, ErrKind},
         param::{authorization_service_param::*, image_service_param::*},
         service::*,
-    }
+    },
 };
 
 use actix_multipart::form::{MultipartForm, json::Json, tempfile::TempFile};
@@ -21,14 +22,6 @@ use actix_web::{HttpServer, web};
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct HttpServerConfig {
     pub port: u16,
-}
-
-#[derive(Clone)]
-pub struct Container {
-    pub authorization_service: Arc<dyn AuthorizationService>,
-    pub token_service: Arc<dyn TokenService>,
-    pub image_service: Arc<dyn ImageService>,
-    pub config: Config,
 }
 
 pub async fn serve(container: Arc<Container>) -> std::io::Result<()> {
@@ -92,7 +85,6 @@ async fn sign_url(
     authorization_service: web::Data<dyn AuthorizationService>,
     param: web::Json<GenerateSignUrlTokenParam>,
 ) -> Result<web::Json<GenerateSignUrlTokenResult>, DomainErr> {
-    let result = authorization_service
-        .generate_sign_url_token(param.into_inner())?;
+    let result = authorization_service.generate_sign_url_token(param.into_inner())?;
     Ok(web::Json(result))
 }

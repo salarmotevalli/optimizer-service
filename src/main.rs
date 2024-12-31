@@ -1,19 +1,23 @@
 use std::sync::Arc;
 
 use serviceorented::{
-    api::http::{Container, serve}, app_config, service::{
-        authorization_service::{AuthorizationConfig, AuthorizationServiceImpl}, image_service::ImageServiceImpl,
+    api::http::serve,
+    app_config,
+    container::Container,
+    service::{
+        authorization_service::{AuthorizationConfig, AuthorizationServiceImpl},
+        image_service::ImageServiceImpl,
         jwt_token_service::{JwtTokenConfig, JwtTokenService},
-    }
+    },
 };
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // todo read app name from env
     let cnf = app_config::load("siagoosh".to_string());
 
     env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
 
-    // TODO: make it dynamic
     std::fs::create_dir_all(&cnf.file_temp_dir)?;
 
     let token_service = Arc::new(JwtTokenService {
@@ -30,11 +34,11 @@ async fn main() -> std::io::Result<()> {
     });
     let image_service = Arc::new(ImageServiceImpl {});
 
-    serve(Arc::new(Container {
+    serve(Arc::new(Container::new(
+        cnf,
         authorization_service,
         token_service,
         image_service,
-        config: cnf,
-    }))
+    )))
     .await
 }

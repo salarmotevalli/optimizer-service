@@ -1,5 +1,3 @@
-use async_trait::async_trait;
-
 use crate::domain::{error::DomainResult, param::token_service_param::*};
 
 pub trait TokenService: Send + Sync {

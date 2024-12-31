@@ -1,8 +1,11 @@
 // pub struct AppConfig {}
 
+use crate::{
+    api::http::HttpServerConfig,
+    service::{authorization_service, jwt_token_service},
+};
 use figment::providers::{Env, Format, Yaml};
 use serde::{Deserialize, Serialize};
-use crate::{api::http::HttpServerConfig, service::{authorization_service, jwt_token_service}};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Config {
@@ -17,21 +20,18 @@ pub struct Config {
 
 pub fn load(app_name: String) -> Config {
     let prefix = format!("{}_", app_name.to_uppercase());
-    
-    let yaml = Yaml::file("./config.yml"); 
-    let env = Env::prefixed(&prefix)
-    .split("__");
 
-    let config: Config= figment::Figment::new()
-    
-    // default values
-    .join(("app_name", app_name))
-    .join(("file_temp_dir", "./tmp".to_string()))
-    
-    .merge(yaml)
-    
-    .merge(env)
-    .extract().unwrap();
+    let yaml = Yaml::file("./config.yml");
+    let env = Env::prefixed(&prefix).split("__");
+
+    let config: Config = figment::Figment::new()
+        // default values
+        .join(("app_name", app_name))
+        .join(("file_temp_dir", "./tmp".to_string()))
+        .merge(yaml)
+        .merge(env)
+        .extract()
+        .unwrap();
 
     config
 }
