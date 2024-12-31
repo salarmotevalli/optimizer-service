@@ -11,12 +11,13 @@ pub struct OptImgParam {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct OptImgResult {
-    pub img: Image,
+    pub image: Image,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct StoreImageInfoParam {
-    pub img: Image,
+    pub image: Image,
+    pub specification: ImageSpecification,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

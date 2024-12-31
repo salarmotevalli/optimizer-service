@@ -3,7 +3,8 @@ use std::sync::Arc;
 use serviceorented::{
     api::http::{Config, Container},
     service::{
-        image_service::ImageServiceImpl, sign_url_service::SignUrlServiceImpl,
+        authorization_service::{AuthorizationServiceImpl, SignUrlServiceImpl},
+        image_service::ImageServiceImpl,
         token_service::TokenServiceImpl,
     },
 };
@@ -23,13 +24,13 @@ async fn main() -> std::io::Result<()> {
     std::fs::create_dir_all(&cnf.file_path)?;
 
     let token_service = Arc::new(TokenServiceImpl {});
-    let sign_url_service = Arc::new(SignUrlServiceImpl {
+    let authorization_service = Arc::new(AuthorizationServiceImpl {
         token_service: token_service.clone(),
     });
     let image_service = Arc::new(ImageServiceImpl {});
 
     serve(Arc::new(Container {
-        sign_url_service,
+        authorization_service,
         token_service,
         image_service,
         config: cnf,
