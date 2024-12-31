@@ -7,7 +7,7 @@ use crate::domain::param::authorization_service_param::*;
 use crate::domain::param::token_service_param::{GenerateTokenParam, VerifyTokenParam};
 use crate::domain::service::{AuthorizationService, TokenService};
 
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug,Clone, Serialize, Deserialize)]
 pub struct AuthorizationConfig {
     pub ext_white_list: Vec<String>,
 }

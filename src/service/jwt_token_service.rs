@@ -6,7 +6,7 @@ use crate::domain::service::TokenService;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JwtTokenConfig {
     pub secret: String,
     pub expration_time: u64,

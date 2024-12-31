@@ -2,27 +2,25 @@ mod create_app;
 mod error_mapper;
 
 pub use create_app::create_app;
+use serde::{Deserialize, Serialize};
 
 use std::sync::Arc;
 
 use crate::{
-    domain::{
+    app_config::Config, domain::{
         entity,
         error::{DomainErr, ErrKind},
         param::{authorization_service_param::*, image_service_param::*},
         service::*,
-    },
-    validation::upload_image_validation::UploadImageValidation,
+    }
 };
 
 use actix_multipart::form::{MultipartForm, json::Json, tempfile::TempFile};
 use actix_web::{HttpServer, web};
 
-#[derive(Clone)]
-pub struct Config {
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct HttpServerConfig {
     pub port: u16,
-    pub file_path: String,
-    pub image_white_list: Vec<String>,
 }
 
 #[derive(Clone)]
@@ -53,7 +51,6 @@ async fn upload_image(
     container: web::Data<Container>,
     MultipartForm(form): MultipartForm<UploadForm>,
 ) -> Result<web::Json<StoreImageInfoResult>, DomainErr> {
-    let _validation = UploadImageValidation::new(&form, container.config.clone()).validate()?;
     let file_name = form.file.file_name.unwrap();
     let path = format!("./tmp/{}", file_name);
 

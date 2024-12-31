@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use serviceorented::{
-    api::http::{Config, Container}, app_config, service::{
+    api::http::{Container, serve}, app_config, service::{
         authorization_service::{AuthorizationConfig, AuthorizationServiceImpl}, image_service::ImageServiceImpl,
         jwt_token_service::{JwtTokenConfig, JwtTokenService},
     }
@@ -9,20 +9,12 @@ use serviceorented::{
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    use serviceorented::api::http::serve;
     let cnf = app_config::load("siagoosh".to_string());
-
-    todo!();
-    let cnf = Config {
-        port: 8080,
-        file_path: "./tmp".to_string(),
-        image_white_list: vec!["png".to_string(), "jpg".to_string(), "jpeg".to_string()],
-    };
 
     env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
 
     // TODO: make it dynamic
-    std::fs::create_dir_all(&cnf.file_path)?;
+    std::fs::create_dir_all(&cnf.file_temp_dir)?;
 
     let token_service = Arc::new(JwtTokenService {
         config: JwtTokenConfig {

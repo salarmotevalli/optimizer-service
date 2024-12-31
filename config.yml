@@ -9,3 +9,6 @@ authorization_service_config:
     - "jpg"
     - "png"
     - "jpeg"
+
+http_server_config:
+  port: 8080

@@ -2,10 +2,15 @@
 
 use figment::providers::{Env, Format, Yaml};
 use serde::{Deserialize, Serialize};
-use crate::service::{authorization_service, jwt_token_service};
+use crate::{api::http::HttpServerConfig, service::{authorization_service, jwt_token_service}};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Config {
+    // root config
+    pub app_name: String,
+    pub file_temp_dir: String,
+
+    pub http_server_config: HttpServerConfig,
     pub token_service_config: jwt_token_service::JwtTokenConfig,
     pub authorization_service_config: authorization_service::AuthorizationConfig,
 }
@@ -13,9 +18,19 @@ pub struct Config {
 pub fn load(app_name: String) -> Config {
     let prefix = format!("{}_", app_name.to_uppercase());
     
+    let yaml = Yaml::file("./config.yml"); 
+    let env = Env::prefixed(&prefix)
+    .split("__");
+
     let config: Config= figment::Figment::new()
-    .merge(Yaml::file("./config.yml"))
-    .merge(Env::prefixed(&prefix).split("__").map(|i| i.to_string().to_lowercase().into()))
+    
+    // default values
+    .join(("app_name", app_name))
+    .join(("file_temp_dir", "./tmp".to_string()))
+    
+    .merge(yaml)
+    
+    .merge(env)
     .extract().unwrap();
 
     config
