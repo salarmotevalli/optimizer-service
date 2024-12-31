@@ -3,13 +3,18 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait AuthorizationService: Send + Sync {
-    async fn generate_sign_url_token(
+    fn generate_sign_url_token(
         &self,
         param: GenerateSignUrlTokenParam,
     ) -> DomainResult<GenerateSignUrlTokenResult>;
 
-    async fn authorize_image_upload(
+    fn authorize_image_upload(
         &self,
         param: AuthorizeImageUploadParam,
     ) -> DomainResult<AuthorizeImageUploadResult>;
+
+    fn authorize_image_format(
+        &self,
+        param: AuthorizeImageFormatParam,
+    ) -> DomainResult<AuthorizeImageFormatResult>;
 }

@@ -7,26 +7,16 @@ use std::sync::Arc;
 
 use crate::{
     domain::{
-        entity::{self, image::Image},
+        entity,
         error::{DomainErr, ErrKind},
-        param::{
-            authorization_service_param::{
-                AuthorizeImageUploadParam, GenerateSignUrlTokenParam, GenerateSignUrlTokenResult,
-            },
-            image_service_param::{
-                OptImgParam, OptImgResult, StoreImageInfoParam, StoreImageInfoResult,
-            },
-            token_service_param::VerifyTokenParam,
-        },
-        service::{AuthorizationService, ImageService, TokenService},
+        param::{authorization_service_param::*, image_service_param::*},
+        service::*,
     },
     validation::upload_image_validation::UploadImageValidation,
 };
 
 use actix_multipart::form::{MultipartForm, json::Json, tempfile::TempFile};
 use actix_web::{HttpServer, web};
-
-use serde::Deserialize;
 
 #[derive(Clone)]
 pub struct Config {
@@ -56,12 +46,7 @@ pub async fn serve(container: Arc<Container>) -> std::io::Result<()> {
 pub struct UploadForm {
     #[multipart(limit = "5MB")]
     pub file: TempFile,
-    pub params: Json<UploadImageParam>,
-}
-
-#[derive(Deserialize, Debug)]
-struct UploadImageParam {
-    specification: entity::image_specification::ImageSpecification,
+    pub params: Json<entity::image_specification::ImageSpecification>,
 }
 
 async fn upload_image(
@@ -72,7 +57,7 @@ async fn upload_image(
     let file_name = form.file.file_name.unwrap();
     let path = format!("./tmp/{}", file_name);
 
-    let image = Image {
+    let image = entity::image::Image {
         full_name: file_name,
         size: form.file.size,
         ..Default::default()
@@ -80,9 +65,10 @@ async fn upload_image(
 
     let store_image_param = StoreImageInfoParam {
         image: image.clone(),
-        specification: form.params.into_inner().specification,
+        specification: form.params.into_inner(),
     };
 
+    // TODO: replace real token with test
     let auth_param = AuthorizeImageUploadParam {
         token: "test".to_string(),
         image,
@@ -90,8 +76,7 @@ async fn upload_image(
 
     container
         .authorization_service
-        .authorize_image_upload(auth_param)
-        .await?;
+        .authorize_image_upload(auth_param)?;
 
     form.file
         .file
@@ -111,8 +96,6 @@ async fn sign_url(
     param: web::Json<GenerateSignUrlTokenParam>,
 ) -> Result<web::Json<GenerateSignUrlTokenResult>, DomainErr> {
     let result = authorization_service
-        .generate_sign_url_token(param.into_inner())
-        .await?;
-
+        .generate_sign_url_token(param.into_inner())?;
     Ok(web::Json(result))
 }

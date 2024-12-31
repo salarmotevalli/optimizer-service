@@ -9,7 +9,7 @@ pub struct ImageServiceImpl {}
 #[async_trait]
 impl ImageService for ImageServiceImpl {
     async fn opt_img(&self, param: OptImgParam) -> DomainResult<OptImgResult> {
-        DomainResult::Ok(OptImgResult { img: param.image })
+        DomainResult::Ok(OptImgResult { image: param.image })
     }
 
     async fn store_img_info(

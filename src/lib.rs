@@ -4,4 +4,4 @@ pub mod infra;
 pub mod service;
 pub mod validation;
 
-pub mod config;
+pub mod app_config;

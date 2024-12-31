@@ -1,0 +1,11 @@
+
+
+token_service_config:
+  secret: "secret"
+  expration_time: 3600
+
+authorization_service_config:
+  ext_white_list:
+    - "jpg"
+    - "png"
+    - "jpeg"

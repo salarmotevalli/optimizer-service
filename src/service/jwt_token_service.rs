@@ -1,17 +1,20 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::domain::error::{DomainErr, DomainResult, ErrKind};
 use crate::domain::param::token_service_param::*;
 use crate::domain::service::TokenService;
-use async_trait::async_trait;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use serde::{Deserialize, Serialize};
 
-const SECRET: &str = "test";
+#[derive(Debug, Serialize, Deserialize)]
+pub struct JwtTokenConfig {
+    pub secret: String,
+    pub expration_time: u64,
+}
 
-#[derive(Clone)]
-
-pub struct TokenServiceImpl {}
+pub struct JwtTokenService {
+    pub config: JwtTokenConfig,
+}
 
 #[derive(Serialize, Deserialize)]
 struct Claims {
@@ -21,16 +24,10 @@ struct Claims {
     ext: String,
 }
 
-#[async_trait]
-impl TokenService for TokenServiceImpl {
-    async fn generate_token(&self, param: GenerateTokenParam) -> DomainResult<GenerateTokenResult> {
-        let du = Duration::from_secs(12 * 60 * 60).as_secs();
-
-        let exp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs()
-            + du;
+impl TokenService for JwtTokenService {
+    fn generate_token(&self, param: GenerateTokenParam) -> DomainResult<GenerateTokenResult> {
+        let exp =
+            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() + self.config.expration_time;
 
         let c = Claims {
             size: param.image_size,
@@ -39,30 +36,24 @@ impl TokenService for TokenServiceImpl {
             exp: exp as usize,
         };
 
-        // TODO: change the secret
         let token = encode(
             &Header::default(),
             &c,
-            &EncodingKey::from_secret(SECRET.as_ref()),
-        )
-        .map_err(|e| DomainErr::new(e.to_string(), ErrKind::UnExpectedErr))?;
+            &EncodingKey::from_secret(self.config.secret.as_ref()),
+        )?;
 
         Ok(GenerateTokenResult { token })
     }
 
-    async fn verify_token(&self, param: VerifyTokenParam) -> DomainResult<VerifyTokenResult> {
+    fn verify_token(&self, param: VerifyTokenParam) -> DomainResult<VerifyTokenResult> {
         let token = decode::<Claims>(
             &param.token,
-            &DecodingKey::from_secret(SECRET.as_ref()),
+            &DecodingKey::from_secret(self.config.secret.as_ref()),
             &Validation::default(),
-        )
-        .map_err(|e| DomainErr::new(e.to_string(), ErrKind::UnExpectedErr))?;
+        )?;
 
         // TODO: check the token is expired
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as usize;
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as usize;
 
         if token.claims.exp < now {
             return DomainResult::Err(DomainErr::new(

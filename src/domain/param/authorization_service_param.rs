@@ -22,3 +22,9 @@ pub struct AuthorizeImageUploadParam {
 pub struct AuthorizeImageUploadResult {
     pub authorized: bool,
 }
+
+pub struct AuthorizeImageFormatParam {
+    pub ext: String,
+}
+
+pub struct AuthorizeImageFormatResult {}

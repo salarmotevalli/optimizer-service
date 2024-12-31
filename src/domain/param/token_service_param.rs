@@ -4,7 +4,6 @@ use crate::domain::entity::image::Image;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GenerateTokenParam {
-    pub expire_time: u64,
     pub image_name: String,
     pub image_ext: String,
     pub image_size: usize,

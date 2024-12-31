@@ -1,51 +1,62 @@
 use std::sync::Arc;
 
+use serde::{Deserialize, Serialize};
+
 use crate::domain::error::{DomainErr, DomainResult, ErrKind};
 use crate::domain::param::authorization_service_param::*;
 use crate::domain::param::token_service_param::{GenerateTokenParam, VerifyTokenParam};
 use crate::domain::service::{AuthorizationService, TokenService};
-use async_trait::async_trait;
 
-#[derive(Clone)]
-pub struct AuthorizationServiceImpl {
-    pub token_service: Arc<dyn TokenService>,
+#[derive(Debug,Serialize, Deserialize)]
+pub struct AuthorizationConfig {
+    pub ext_white_list: Vec<String>,
 }
 
-#[async_trait]
+pub struct AuthorizationServiceImpl {
+    pub token_service: Arc<dyn TokenService>,
+    pub config: AuthorizationConfig,
+}
+
 impl AuthorizationService for AuthorizationServiceImpl {
-    async fn generate_sign_url_token(
+    fn generate_sign_url_token(
         &self,
         param: GenerateSignUrlTokenParam,
     ) -> DomainResult<GenerateSignUrlTokenResult> {
-        let token = self
-            .token_service
-            .generate_token(GenerateTokenParam {
-                expire_time: 60 * 60 * 24,
-                image_name: param.image_name,
-                image_ext: param.image_ext,
-                image_size: param.image_size,
-            })
-            .await?;
+        let token = self.token_service.generate_token(GenerateTokenParam {
+            image_name: param.image_name,
+            image_ext: param.image_ext,
+            image_size: param.image_size,
+        })?;
 
         DomainResult::Ok(GenerateSignUrlTokenResult { token: token.token })
     }
 
-    async fn authorize_image_upload(
+    fn authorize_image_upload(
         &self,
         param: AuthorizeImageUploadParam,
     ) -> DomainResult<AuthorizeImageUploadResult> {
+        let _is_token_verified = self.token_service.verify_token(VerifyTokenParam {
+            token: "test".to_string(),
+            image: param.image.clone(),
+        })?;
+
+        let _is_image_format_valid = self.authorize_image_format(AuthorizeImageFormatParam {
+            ext: param.image.ext(),
+        })?;
+
         return DomainResult::Ok(AuthorizeImageUploadResult { authorized: true });
+    }
 
-        self.token_service
-            .verify_token(VerifyTokenParam {
-                token: "test".to_string(),
-                image: param.image,
-            })
-            .await;
-
-        return Err(DomainErr::new(
-            "invalid token".to_string(),
-            ErrKind::UnAuthorizedErr,
-        ));
+    fn authorize_image_format(
+        &self,
+        param: AuthorizeImageFormatParam,
+    ) -> DomainResult<AuthorizeImageFormatResult> {
+        match self.config.ext_white_list.contains(&param.ext) {
+            true => DomainResult::Ok(AuthorizeImageFormatResult {}),
+            false => DomainResult::Err(DomainErr::new(
+                "invalid image format".to_string(),
+                ErrKind::Forbidden,
+            )),
+        }
     }
 }

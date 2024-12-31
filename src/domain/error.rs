@@ -1,3 +1,5 @@
+use std::time::SystemTimeError;
+
 pub type DomainResult<T> = Result<T, DomainErr>;
 
 #[derive(Debug)]
@@ -18,9 +20,28 @@ impl std::fmt::Display for DomainErr {
     }
 }
 
+impl From<SystemTimeError> for DomainErr {
+    fn from(value: SystemTimeError) -> Self {
+        Self {
+            message: value.to_string(),
+            kind: ErrKind::UnExpectedErr,
+        }
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for DomainErr {
+    fn from(value: jsonwebtoken::errors::Error) -> Self {
+        Self {
+            message: value.to_string(),
+            kind: ErrKind::UnExpectedErr,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum ErrKind {
     UnExpectedErr,
     UnAuthorizedErr,
+    Forbidden,
     UnprocessableErr,
 }
