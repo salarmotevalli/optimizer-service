@@ -31,9 +31,14 @@ impl From<SystemTimeError> for DomainErr {
 
 impl From<jsonwebtoken::errors::Error> for DomainErr {
     fn from(value: jsonwebtoken::errors::Error) -> Self {
+        let kind = match value.kind() {
+            jsonwebtoken::errors::ErrorKind::InvalidToken => ErrKind::UnAuthorizedErr,
+            _ => ErrKind::UnExpectedErr,
+        };
+        
         Self {
             message: value.to_string(),
-            kind: ErrKind::UnExpectedErr,
+            kind
         }
     }
 }

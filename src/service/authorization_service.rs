@@ -36,7 +36,7 @@ impl AuthorizationService for AuthorizationServiceImpl {
         param: AuthorizeImageUploadParam,
     ) -> DomainResult<AuthorizeImageUploadResult> {
         let _is_token_verified = self.token_service.verify_token(VerifyTokenParam {
-            token: "test".to_string(),
+            token: param.token,
             image: param.image.clone(),
         })?;
 
@@ -44,7 +44,7 @@ impl AuthorizationService for AuthorizationServiceImpl {
             ext: param.image.ext(),
         })?;
 
-        return DomainResult::Ok(AuthorizeImageUploadResult { authorized: true });
+        DomainResult::Ok(AuthorizeImageUploadResult { authorized: true })
     }
 
     fn authorize_image_format(

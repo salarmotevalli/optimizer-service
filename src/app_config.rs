@@ -1,5 +1,3 @@
-// pub struct AppConfig {}
-
 use crate::{
     api::http::HttpServerConfig,
     service::{authorization_service, jwt_token_service},
@@ -13,6 +11,7 @@ pub struct Config {
     pub app_name: String,
     pub file_temp_dir: String,
 
+    // service config
     pub http_server_config: HttpServerConfig,
     pub token_service_config: jwt_token_service::JwtTokenConfig,
     pub authorization_service_config: authorization_service::AuthorizationConfig,

@@ -55,6 +55,7 @@ impl TokenService for JwtTokenService {
         // TODO: check the token is expired
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as usize;
 
+        println!("{} {}", now, token.claims.exp);
         if token.claims.exp < now {
             return DomainResult::Err(DomainErr::new(
                 "Token is expired".to_string(),
@@ -62,13 +63,12 @@ impl TokenService for JwtTokenService {
             ));
         }
 
-        if token.claims.exp < now
-            || token.claims.name != param.image.full_name
+        if token.claims.name != param.image.full_name
             || token.claims.ext != param.image.ext()
             || token.claims.size != param.image.size
         {
             return DomainResult::Err(DomainErr::new(
-                "Token is invalid".to_string(),
+                "Token claims do not match the provided image details".to_string(),
                 ErrKind::UnAuthorizedErr,
             ));
         }

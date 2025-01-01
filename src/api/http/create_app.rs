@@ -29,7 +29,7 @@ pub fn create_app(
         .wrap(Logger::new("%a %{User-Agent}i"))
         .service(
             web::scope("/opt")
-                .route("/sign-url", web::post().to(sign_url))
+                .route("/sign-url-token", web::post().to(sign_url_token))
                 .route("/upload", web::post().to(upload_image)),
         )
 }

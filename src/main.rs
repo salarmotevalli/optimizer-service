@@ -21,17 +21,14 @@ async fn main() -> std::io::Result<()> {
     std::fs::create_dir_all(&cnf.file_temp_dir)?;
 
     let token_service = Arc::new(JwtTokenService {
-        config: JwtTokenConfig {
-            secret: "".to_string(),
-            expration_time: 0,
-        },
+        config: cnf.token_service_config.clone(),
     });
+
     let authorization_service = Arc::new(AuthorizationServiceImpl {
         token_service: token_service.clone(),
-        config: AuthorizationConfig {
-            ext_white_list: vec![],
-        },
+        config: cnf.authorization_service_config.clone(),
     });
+    
     let image_service = Arc::new(ImageServiceImpl {});
 
     serve(Arc::new(Container::new(

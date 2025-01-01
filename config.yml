@@ -1,8 +1,8 @@
-
+file_temp_dir: "./tmp"
 
 token_service_config:
-  secret: "secret"
-  expration_time: 3600
+  secret: "si@goosh-im@ge-optimizer-service"
+  expration_time: 36000
 
 authorization_service_config:
   ext_white_list:
@@ -12,3 +12,4 @@ authorization_service_config:
 
 http_server_config:
   port: 8080
+  workers: 2
