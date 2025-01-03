@@ -3,13 +3,23 @@ file_temp_dir: "./tmp"
 token_service_config:
   secret: "si@goosh-im@ge-optimizer-service"
   expration_time: 36000
-
 authorization_service_config:
+
   ext_white_list:
     - "jpg"
     - "png"
     - "jpeg"
+    - "webp"
 
 http_server_config:
   port: 8080
   workers: 2
+
+rabbit_mq_config:
+  connection_url: "amqp://siagoosh:siagoosh@localhost:5672/%2f"
+
+image_queue_config:
+  queue_name: 'image_optimization_queue'
+  exchange_name: "image_optimization_exchange"
+  routing_key: "image_optimization"
+  consumer_tag: "image_optimization_consumer_tag"

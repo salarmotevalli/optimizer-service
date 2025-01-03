@@ -1,4 +1,6 @@
-use std::time::SystemTimeError;
+use std::fmt::{Debug, Display};
+
+use std::error::Error;
 
 pub type DomainResult<T> = Result<T, DomainErr>;
 
@@ -14,31 +16,17 @@ impl DomainErr {
     }
 }
 
-impl std::fmt::Display for DomainErr {
+impl Display for DomainErr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.message)
     }
 }
 
-impl From<SystemTimeError> for DomainErr {
-    fn from(value: SystemTimeError) -> Self {
+impl<T: Error> From<T> for DomainErr {
+    fn from(value: T) -> Self {
         Self {
             message: value.to_string(),
             kind: ErrKind::UnExpectedErr,
-        }
-    }
-}
-
-impl From<jsonwebtoken::errors::Error> for DomainErr {
-    fn from(value: jsonwebtoken::errors::Error) -> Self {
-        let kind = match value.kind() {
-            jsonwebtoken::errors::ErrorKind::InvalidToken => ErrKind::UnAuthorizedErr,
-            _ => ErrKind::UnExpectedErr,
-        };
-        
-        Self {
-            message: value.to_string(),
-            kind
         }
     }
 }

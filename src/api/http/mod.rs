@@ -12,14 +12,13 @@ use crate::{
         entity::{self, image_specification},
         error::{DomainErr, ErrKind},
         param::{authorization_service_param::*, image_service_param::*},
-        service::*,
     },
 };
 
 use actix_multipart::form::{MultipartForm, json::Json, tempfile::TempFile};
 use actix_web::{
     HttpServer,
-    web::{self, Query},
+    web::{self},
 };
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -71,7 +70,7 @@ async fn upload_image(
 
     let auth_param = AuthorizeImageUploadParam {
         token: query.token.clone(),
-            image,
+        image,
     };
 
     container
@@ -95,6 +94,8 @@ async fn sign_url_token(
     container: web::Data<Container>,
     param: web::Json<GenerateSignUrlTokenParam>,
 ) -> Result<web::Json<GenerateSignUrlTokenResult>, DomainErr> {
-    let result = container.authorization_service.generate_sign_url_token(param.into_inner())?;
+    let result = container
+        .authorization_service
+        .generate_sign_url_token(param.into_inner())?;
     Ok(web::Json(result))
 }

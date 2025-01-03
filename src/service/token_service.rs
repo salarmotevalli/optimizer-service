@@ -12,7 +12,7 @@ pub struct JwtTokenConfig {
     pub expration_time: u64,
 }
 
-pub struct JwtTokenService {
+pub struct TokenServiceJWTImpl {
     pub config: JwtTokenConfig,
 }
 
@@ -24,7 +24,7 @@ struct Claims {
     ext: String,
 }
 
-impl TokenService for JwtTokenService {
+impl TokenService for TokenServiceJWTImpl {
     fn generate_token(&self, param: GenerateTokenParam) -> DomainResult<GenerateTokenResult> {
         let exp =
             SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() + self.config.expration_time;
@@ -32,7 +32,7 @@ impl TokenService for JwtTokenService {
         let c = Claims {
             size: param.image_size,
             name: param.image_name,
-            ext: param.image_ext,
+            ext: param.image_format,
             exp: exp as usize,
         };
 
@@ -50,12 +50,16 @@ impl TokenService for JwtTokenService {
             &param.token,
             &DecodingKey::from_secret(self.config.secret.as_ref()),
             &Validation::default(),
-        )?;
+        )
+        .map_err(|e| match e.kind() {
+            jsonwebtoken::errors::ErrorKind::InvalidToken => {
+                DomainErr::new(e.to_string(), ErrKind::UnAuthorizedErr)
+            }
+            _ => DomainErr::new(e.to_string(), ErrKind::UnExpectedErr),
+        })?;
 
-        // TODO: check the token is expired
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as usize;
 
-        println!("{} {}", now, token.claims.exp);
         if token.claims.exp < now {
             return DomainResult::Err(DomainErr::new(
                 "Token is expired".to_string(),

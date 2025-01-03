@@ -24,7 +24,7 @@ impl AuthorizationService for AuthorizationServiceImpl {
     ) -> DomainResult<GenerateSignUrlTokenResult> {
         let token = self.token_service.generate_token(GenerateTokenParam {
             image_name: param.image_name,
-            image_ext: param.image_ext,
+            image_format: param.image_format,
             image_size: param.image_size,
         })?;
 

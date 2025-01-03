@@ -4,23 +4,23 @@ use serviceorented::{
     api::http::serve,
     app_config,
     container::Container,
+    infra::queue::rabbitmq::{conn, image_queue::ImageQueueRabbitMQImpl},
     service::{
-        authorization_service::{AuthorizationConfig, AuthorizationServiceImpl},
-        image_service::ImageServiceImpl,
-        jwt_token_service::{JwtTokenConfig, JwtTokenService},
+        authorization_service::AuthorizationServiceImpl, image_service::ImageServiceImpl,
+        token_service::TokenServiceJWTImpl,
     },
 };
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // todo read app name from env
-    let cnf = app_config::load("siagoosh".to_string());
+    let cnf = app_config::Config::load("siagoosh".to_string());
 
     env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
 
     std::fs::create_dir_all(&cnf.file_temp_dir)?;
 
-    let token_service = Arc::new(JwtTokenService {
+    let token_service = Arc::new(TokenServiceJWTImpl {
         config: cnf.token_service_config.clone(),
     });
 
@@ -28,8 +28,15 @@ async fn main() -> std::io::Result<()> {
         token_service: token_service.clone(),
         config: cnf.authorization_service_config.clone(),
     });
-    
-    let image_service = Arc::new(ImageServiceImpl {});
+
+    let rabbit_conn = conn(cnf.rabbit_mq_config.clone()).await;
+
+    let image_queue =
+        ImageQueueRabbitMQImpl::new(Arc::new(rabbit_conn), cnf.image_queue_config.clone());
+
+    let image_service = Arc::new(ImageServiceImpl {
+        image_queue: Arc::new(image_queue),
+    });
 
     serve(Arc::new(Container::new(
         cnf,
