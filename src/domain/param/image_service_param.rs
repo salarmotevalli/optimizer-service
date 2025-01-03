@@ -5,7 +5,7 @@ use crate::domain::entity::image_specification::ImageSpecification;
 
 #[derive(Serialize, Deserialize)]
 pub struct OptImgParam {
-    pub image: Image,
+    pub image_path: String,
     pub specification: ImageSpecification,
 }
 

@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
 use tokio;
-use serviceorented::{api::queue::QueueConsumer, app_config::Config, infra::queue::rabbitmq::{conn, image_queue::ImageQueueRabbitMQImpl}, service::image_service::{self, ImageServiceImpl}};
+use serviceorented::{api::queue::QueueConsumer, app_config::Config, infra::queue::rabbitmq::{conn, image_queue::ImageQueueRabbitMQImpl}, service::image_service::ImageServiceImpl};
 
 fn main() {
-
+    
     let rt = tokio::runtime::Builder::new_multi_thread()
     // make it dynamic
     .worker_threads(4)
     .enable_all()
-    .thread_name("my-custom-name")
-    .thread_stack_size(3 * 1024 * 1024)
+    .thread_name("queue-worker")
+    .thread_stack_size(4 * 1024 * 1024)
     .build()
     .unwrap();
 

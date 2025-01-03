@@ -15,6 +15,8 @@ jsonwebtoken = "9"
 env_logger= "0.11.6"
 actix-multipart = "0.7.2"
 figment = { version = "0.10", features = ["yaml", "env"] }
+clap = { version = "4.5.23", features = ["derive"] }
+rimage = { version="0.10.3" }
 
 [[bin]]
 name = "queue"

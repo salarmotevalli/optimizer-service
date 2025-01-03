@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use futures_lite::StreamExt;
-use lapin::{Channel, Consumer, Queue, options::*, types::FieldTable};
-use serde::de;
+use lapin::options::*;
 
 use crate::{
     domain::{param::image_service_param::OptImgParam, service::ImageService},
@@ -12,6 +11,7 @@ use crate::{
 pub struct QueueConsumer {
     config: ImageQueueConfig,
     conn: Arc<lapin::Connection>,
+    // TODO: replace with container
     image_service: Arc<dyn ImageService>,
 }
 

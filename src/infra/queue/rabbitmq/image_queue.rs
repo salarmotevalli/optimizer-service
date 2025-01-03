@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use lapin::{
-    BasicProperties, ExchangeKind,
-    options::{BasicPublishOptions, ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions},
+    BasicProperties,
+    options::{BasicPublishOptions, QueueBindOptions},
     types::FieldTable,
 };
 use serde::{Deserialize, Serialize};

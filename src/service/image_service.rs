@@ -1,5 +1,7 @@
+use std::fmt::format;
 use std::sync::Arc;
 
+use crate::domain::entity::image::Image;
 use crate::domain::error::DomainResult;
 use crate::domain::param::image_service_param::*;
 use crate::domain::queue::image_queue::ImageQueue;
@@ -14,7 +16,9 @@ pub struct ImageServiceImpl {
 #[async_trait]
 impl ImageService for ImageServiceImpl {
     async fn opt_img(&self, param: OptImgParam) -> DomainResult<OptImgResult> {
-        DomainResult::Ok(OptImgResult { image: param.image })
+        
+        
+        Ok(OptImgResult{image: Image::default()})
     }
 
     async fn store_img_info(
@@ -22,7 +26,7 @@ impl ImageService for ImageServiceImpl {
         param: StoreImageInfoParam,
     ) -> DomainResult<StoreImageInfoResult> {
         let opt_image_param = OptImgParam {
-            image: param.image,
+            image_path: format!("{}/{}", "temp", param.image.full_name),
             specification: param.specification,
         };
 
