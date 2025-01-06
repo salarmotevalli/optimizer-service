@@ -4,7 +4,7 @@ use serviceorented::{
     api::http::serve,
     app_config,
     container::Container,
-    infra::queue::rabbitmq::{conn, image_queue::ImageQueueRabbitMQImpl},
+    infra::queue::nats::{NatsQueue, image_queue::ImageQueueNatsImpl},
     service::{
         authorization_service::AuthorizationServiceImpl, image_service::ImageServiceImpl,
         token_service::TokenServiceJWTImpl,
@@ -29,10 +29,12 @@ async fn main() -> std::io::Result<()> {
         config: cnf.authorization_service_config.clone(),
     });
 
-    let rabbit_conn = conn(cnf.rabbit_mq_config.clone()).await;
+    let nats_queue = NatsQueue::new(cnf.nats_config.clone()).await;
 
-    let image_queue =
-        ImageQueueRabbitMQImpl::new(Arc::new(rabbit_conn), cnf.image_queue_config.clone());
+    let image_queue = ImageQueueNatsImpl::new(
+        Arc::new(nats_queue.client()),
+        cnf.image_queue_nats_config.clone(),
+    );
 
     let image_service = Arc::new(ImageServiceImpl {
         image_queue: Arc::new(image_queue),

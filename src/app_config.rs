@@ -1,6 +1,6 @@
 use crate::{
     api::http::HttpServerConfig,
-    infra::queue::rabbitmq::{RabbitMQConfig, image_queue::ImageQueueConfig},
+    infra::queue::nats::{NatsConfig, image_queue::ImageQueueNatsConfig},
     service::{authorization_service, token_service},
 };
 use figment::providers::{Env, Format, Yaml};
@@ -18,17 +18,17 @@ pub struct Config {
     pub authorization_service_config: authorization_service::AuthorizationConfig,
 
     // queue
-    pub rabbit_mq_config: RabbitMQConfig,
-    pub image_queue_config: ImageQueueConfig,
+    pub nats_config: NatsConfig,
+    pub image_queue_nats_config: ImageQueueNatsConfig,
 }
 
 impl Config {
     pub fn load(app_name: String) -> Config {
         let prefix = format!("{}_", app_name.to_uppercase());
-    
+
         let yaml = Yaml::file("./config.yml");
         let env = Env::prefixed(&prefix).split("__");
-    
+
         let config: Config = figment::Figment::new()
             // default values
             .join(("app_name", app_name))
@@ -37,7 +37,7 @@ impl Config {
             .merge(env)
             .extract()
             .unwrap();
-    
+
         config
     }
 }

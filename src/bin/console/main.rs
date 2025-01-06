@@ -1,3 +1,4 @@
 fn main() -> Result<(), std::io::Error> {
-    serviceorented::api::command::execute()
+    todo!();
+    // serviceorented::api::command::execute()
 }

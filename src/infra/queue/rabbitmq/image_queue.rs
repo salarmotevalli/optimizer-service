@@ -17,7 +17,7 @@ use crate::domain::{
 use super::RabbitMqImpl;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ImageQueueConfig {
+pub struct ImageQueueRabbitMQConfig {
     pub queue_name: String,
     pub routing_key: String,
     pub exchange_name: String,
@@ -26,11 +26,11 @@ pub struct ImageQueueConfig {
 
 pub struct ImageQueueRabbitMQImpl {
     conn: Arc<lapin::Connection>,
-    config: ImageQueueConfig,
+    config: ImageQueueRabbitMQConfig,
 }
 
 impl ImageQueueRabbitMQImpl {
-    pub fn new(conn: Arc<lapin::Connection>, config: ImageQueueConfig) -> Self {
+    pub fn new(conn: Arc<lapin::Connection>, config: ImageQueueRabbitMQConfig) -> Self {
         Self { conn, config }
     }
 }

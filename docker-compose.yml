@@ -8,16 +8,26 @@ services:
     volumes:
       - redis-data:/data
 
-  rabbitmq:
-    image: "rabbitmq:3-management-alpine"
+
+  nats: 
+    image: "nats:alpine3.21"
     ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: siagoosh
-      RABBITMQ_DEFAULT_PASS: siagoosh
+      - "4222:4222"
+      - "8222:8222"
+    command: "--http_port 8222"
+
+    
+  # rabbitmq:
+  #   image: "rabbitmq:3-management-alpine"
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   volumes:
+  #     - rabbitmq-data:/var/lib/rabbitmq
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: siagoosh
+  #     RABBITMQ_DEFAULT_PASS: siagoosh
+
 
 volumes:
   redis-data:

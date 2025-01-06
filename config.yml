@@ -18,8 +18,15 @@ http_server_config:
 rabbit_mq_config:
   connection_url: "amqp://siagoosh:siagoosh@localhost:5672/%2f"
 
-image_queue_config:
+nats_config:
+  connection_url: "nats://localhost:4222"
+
+image_queue_rabbitmq_config:
   queue_name: 'image_optimization_queue'
   exchange_name: "image_optimization_exchange"
   routing_key: "image_optimization"
   consumer_tag: "image_optimization_consumer_tag"
+
+image_queue_nats_config:
+  namespace: 'image_optimization.income'
+  
