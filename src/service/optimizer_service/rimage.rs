@@ -1,6 +1,5 @@
-use std::{fs::{self, File}, path::{Path, PathBuf}, str::FromStr};
+use std::{fs::{self, File}, path::{Path}, str::FromStr};
 
-use async_trait::async_trait;
 use rimage::{config::{Codec, EncoderConfig, QuantizationConfig, ResizeConfig, ResizeType}, image::ImageResult, Decoder, Encoder};
 
 use crate::domain::{error::{DomainErr, DomainResult, ErrKind}, param::image_service_param::OptImgParam, service::OptimizerService};
@@ -8,10 +7,8 @@ use crate::domain::{error::{DomainErr, DomainResult, ErrKind}, param::image_serv
 pub struct OptimizerServiceRImageImpl {}
 
 impl OptimizerServiceRImageImpl {
-    pub fn opt_image(
+    pub fn prepair_conf(
         &self,
-        input: &str,
-        output: &str,
         quality: f32,
         codec: &str,
         filter: &str,
@@ -19,7 +16,7 @@ impl OptimizerServiceRImageImpl {
         dithering: Option<f32>,
         width: Option<usize>,
         height: Option<usize>,
-    ) -> DomainResult<()> {
+    ) -> DomainResult<EncoderConfig> {
         let c = Codec::from_str(codec).map_err(|e| DomainErr::new(e, ErrKind::UnExpectedErr))?;
 
         let mut quantization_config = QuantizationConfig::new();
@@ -54,13 +51,7 @@ impl OptimizerServiceRImageImpl {
             conf = conf.with_resize(resize_config);
         }
 
-        let input_path = PathBuf::from_str(input)?;
-
-        let output_path = PathBuf::from_str(output)?;
-
-        slef.optimize(&input_path, &output_path, conf)?;
-
-        Ok(())
+        Ok(conf)
     }
 
     fn optimize(&self, in_path: &Path, out_path: &Path, conf: EncoderConfig) -> ImageResult<()> {
@@ -80,7 +71,25 @@ impl OptimizerServiceRImageImpl {
 
 impl OptimizerService for OptimizerServiceRImageImpl {
     fn process(&self, param: OptImgParam) -> DomainResult<()> {
-        self.opt_image(format!("./tmp/{}", param.image_path), output, quality, codec, filter, quantization, dithering, width, height)?;
+        let image_path = format!("./tmp/{}", param.image.full_name);
+        let output_path = format!("./tmp/opted/{}", param.image.full_name);
+        
+        let conf = self.prepair_conf(
+            param.specification.quality, 
+            &param.image.ext(),
+            &param.specification.filter,
+            param.specification.quantization,
+            param.specification.dithering,
+            param.specification.width, 
+            param.specification.height
+        )?;
+
+        self.optimize(
+            Path::new(&image_path), 
+            Path::new(&output_path),
+            conf
+        )?;
+
         todo!();
     }
 }

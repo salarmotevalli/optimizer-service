@@ -11,13 +11,13 @@ use async_trait::async_trait;
 #[derive(Clone)]
 pub struct ImageServiceImpl {
     pub image_queue: Arc<dyn ImageQueue>,
-    // pub optimizer_service: Arc<dyn OptimizerService>,
+    pub optimizer_service: Arc<dyn OptimizerService>,
 }
 
 #[async_trait]
 impl ImageService for ImageServiceImpl {
     async fn opt_img(&self, param: OptImgParam) -> DomainResult<OptImgResult> {
-        // self.optimizer_service.process().await?;
+        self.optimizer_service.process(param)?;
 
         Ok(OptImgResult {
             image: Image::default(),
@@ -29,7 +29,7 @@ impl ImageService for ImageServiceImpl {
         param: StoreImageInfoParam,
     ) -> DomainResult<StoreImageInfoResult> {
         let opt_image_param = OptImgParam {
-            image_path: format!("{}/{}", "temp", param.image.full_name),
+            image: param.image,
             specification: param.specification,
         };
 

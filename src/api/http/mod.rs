@@ -9,7 +9,7 @@ use std::sync::Arc;
 use crate::{
     container::Container,
     domain::{
-        entity::{self, image_specification},
+        entity::{self, image_specification::{self, ImageSpecification}},
         error::{DomainErr, ErrKind},
         param::{authorization_service_param::*, image_service_param::*},
     },
@@ -37,11 +37,14 @@ pub async fn serve(container: Arc<Container>) -> std::io::Result<()> {
         .await
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct spec {}
+
 #[derive(Debug, MultipartForm)]
 pub struct UploadForm {
     #[multipart(limit = "5MB")]
     pub file: TempFile,
-    pub params: Json<image_specification::ImageSpecification>,
+    // pub params: Json<image_specification::ImageSpecification>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -65,7 +68,8 @@ async fn upload_image(
 
     let store_image_param = StoreImageInfoParam {
         image: image.clone(),
-        specification: form.params.into_inner(),
+        // specification: form.params.into_inner(),
+        specification: ImageSpecification::default(),
     };
 
     let auth_param = AuthorizeImageUploadParam {

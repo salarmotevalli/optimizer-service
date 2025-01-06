@@ -4,10 +4,9 @@ use serviceorented::{
     api::http::serve,
     app_config,
     container::Container,
-    infra::queue::nats::{NatsQueue, image_queue::ImageQueueNatsImpl},
+    infra::queue::nats::{image_queue::ImageQueueNatsImpl, NatsQueue},
     service::{
-        authorization_service::AuthorizationServiceImpl, image_service::ImageServiceImpl,
-        token_service::TokenServiceJWTImpl,
+        authorization_service::AuthorizationServiceImpl, image_service::ImageServiceImpl, optimizer_service, token_service::TokenServiceJWTImpl
     },
 };
 
@@ -37,6 +36,7 @@ async fn main() -> std::io::Result<()> {
     );
 
     let image_service = Arc::new(ImageServiceImpl {
+        optimizer_service: Arc::new(optimizer_service::OptimizerServiceRImageImpl{}),
         image_queue: Arc::new(image_queue),
     });
 

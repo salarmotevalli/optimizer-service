@@ -46,8 +46,8 @@ impl QueueConsumer {
 
             let delivery = d.unwrap();
 
-            let message = String::from_utf8_lossy(&delivery.data);
-            let image_service_param = serde_json::from_str::<OptImgParam>(&message);
+            let message: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&delivery.data);
+            let image_service_param: Result<OptImgParam, serde_json::Error> = serde_json::from_str::<OptImgParam>(&message);
 
             if let Err(e) = image_service_param {
                 let _ = delivery.reject(BasicRejectOptions { requeue: false });

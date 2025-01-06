@@ -3,8 +3,8 @@ use std::sync::Arc;
 use serviceorented::{
     api::queue::nats::QueueConsumer,
     app_config::Config,
-    infra::queue::nats::{NatsQueue, image_queue::ImageQueueNatsImpl},
-    service::image_service::ImageServiceImpl,
+    infra::queue::nats::{image_queue::ImageQueueNatsImpl, NatsQueue},
+    service::{image_service::ImageServiceImpl, optimizer_service},
 };
 use tokio;
 
@@ -28,6 +28,7 @@ fn main() {
             ImageQueueNatsImpl::new(client.clone(), cnf.image_queue_nats_config.clone());
 
         let image_service = ImageServiceImpl {
+            optimizer_service: Arc::new(optimizer_service::OptimizerServiceRImageImpl{}),
             image_queue: Arc::new(image_queue),
         };
 

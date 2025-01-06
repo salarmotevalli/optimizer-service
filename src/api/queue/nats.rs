@@ -36,11 +36,11 @@ impl QueueConsumer {
             .take(1);
 
         while let Some(message) = subscription.next().await {
-            println!(
-                "{:?} received on {:?}",
-                from_utf8(&message.payload),
-                &message.subject
-            );
+            
+            let pl = from_utf8(&message.payload)?;
+            let image_service_param = serde_json::from_str::<OptImgParam>(&pl).unwrap();
+            
+            self.image_service.opt_img(image_service_param).await.unwrap();
         }
 
         Ok(())
