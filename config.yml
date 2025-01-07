@@ -30,3 +30,9 @@ image_queue_rabbitmq_config:
 image_queue_nats_config:
   namespace: 'image_optimization.income'
   
+
+minio-config:
+  endpoint: "http://0.0.0.0:9000"
+  access_key: "GeoFdEVT5jASgV4z8UXX"
+  secret_key: "NUMAutLce9DxjVvl1N6os7XfHS4rPNqohTqv8cyU"
+  region: "us-east-1"

@@ -19,6 +19,8 @@ clap = { version = "4.5.23", features = ["derive"] }
 rimage = { version="0.10.3" }
 zune-image = "0.4.15"
 async-nats = "0.38.0"
+aws-sdk-s3 = "1.68.0"
+aws-config = {version = "1.5.13", features = ["behavior-version-latest"]}
 
 
 [[bin]]

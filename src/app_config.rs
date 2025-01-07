@@ -1,7 +1,7 @@
 use crate::{
     api::http::HttpServerConfig,
-    infra::queue::nats::{NatsConfig, image_queue::ImageQueueNatsConfig},
-    service::{authorization_service, token_service},
+    infra::queue::nats::{image_queue::ImageQueueNatsConfig, NatsConfig},
+    service::{authorization_service, file_storage_service::minio::MinioConfig, token_service},
 };
 use figment::providers::{Env, Format, Yaml};
 use serde::{Deserialize, Serialize};
@@ -20,6 +20,9 @@ pub struct Config {
     // queue
     pub nats_config: NatsConfig,
     pub image_queue_nats_config: ImageQueueNatsConfig,
+
+    // minio
+    pub minio_config: MinioConfig
 }
 
 impl Config {

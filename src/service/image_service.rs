@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::sync::Arc;
 
 use crate::domain::entity::image::Image;

@@ -1,10 +1,11 @@
-use std::{fs::{self, File}, path::{Path}, str::FromStr};
-
+use std::{io::Cursor, path::Path, slice, str::FromStr, sync::Arc};
 use rimage::{config::{Codec, EncoderConfig, QuantizationConfig, ResizeConfig, ResizeType}, image::ImageResult, Decoder, Encoder};
+use zune_image::image::Image;
+use crate::domain::{error::{DomainErr, DomainResult, ErrKind}, param::{file_storage_service_param::StoreParam, image_service_param::OptImgParam, optimizer_service_param::ProcessResult}, service::{FileStorageService, OptimizerService}};
 
-use crate::domain::{error::{DomainErr, DomainResult, ErrKind}, param::image_service_param::OptImgParam, service::OptimizerService};
-
-pub struct OptimizerServiceRImageImpl {}
+pub struct OptimizerServiceRImageImpl {
+    pub file_storage_service: Arc<dyn FileStorageService>
+}
 
 impl OptimizerServiceRImageImpl {
     pub fn prepair_conf(
@@ -54,25 +55,39 @@ impl OptimizerServiceRImageImpl {
         Ok(conf)
     }
 
-    fn optimize(&self, in_path: &Path, out_path: &Path, conf: EncoderConfig) -> ImageResult<()> {
+    fn optimize(&self, in_path: &Path, conf: EncoderConfig) -> ImageResult<Vec<u8>> {
         let decoder = Decoder::from_path(in_path)?;
-
         let image = decoder.decode()?;
 
-        fs::create_dir_all(out_path.parent().unwrap())?;
-        let out_file = File::create(out_path)?;
+        let buf: Box<[u8]> = vec![0u8].into_boxed_slice(); // Create a Box<[u8]>
+        let ptr = buf.as_ptr();
+        let len = buf.len();
+        
+        // Prevent the Box from deallocating the memory when it goes out of scope.
+        std::mem::forget(&buf);
 
-        let encoder = Encoder::new(out_file, image).with_config(conf);
+      
+        let cursor = Cursor::new(buf); // Create the Cursor
+            
+        let encoder = Encoder::new(cursor, image).with_config(conf);
+        
         encoder.encode()?;
 
-        Ok(())
+        
+        unsafe {
+            let data = slice::from_raw_parts(ptr, len);
+
+            let _ = Box::from_raw(data.as_ptr() as *mut u8); // Deallocates when _ goes out of scope
+
+            Ok(data.to_vec())
+        }   
     }
+    
 }
 
 impl OptimizerService for OptimizerServiceRImageImpl {
-    fn process(&self, param: OptImgParam) -> DomainResult<()> {
+    fn process(&self, param: OptImgParam) -> DomainResult<ProcessResult> {
         let image_path = format!("./tmp/{}", param.image.full_name);
-        let output_path = format!("./tmp/opted/{}", param.image.full_name);
         
         let conf = self.prepair_conf(
             param.specification.quality, 
@@ -84,12 +99,14 @@ impl OptimizerService for OptimizerServiceRImageImpl {
             param.specification.height
         )?;
 
-        self.optimize(
+        let res = self.optimize(
             Path::new(&image_path), 
-            Path::new(&output_path),
             conf
         )?;
 
-        todo!();
+        let store_param = StoreParam {data: res};
+        self.file_storage_service.store(store_param);
+
+        Ok(ProcessResult{})
     }
 }
