@@ -4,7 +4,6 @@ token_service_config:
   secret: "si@goosh-im@ge-optimizer-service"
   expration_time: 36000
 authorization_service_config:
-
   ext_white_list:
     - "jpg"
     - "png"
@@ -31,7 +30,7 @@ image_queue_nats_config:
   namespace: 'image_optimization.income'
   
 
-minio-config:
+minio_config:
   endpoint: "http://0.0.0.0:9000"
   access_key: "GeoFdEVT5jASgV4z8UXX"
   secret_key: "NUMAutLce9DxjVvl1N6os7XfHS4rPNqohTqv8cyU"

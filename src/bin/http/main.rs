@@ -9,7 +9,7 @@ use serviceorented::{
         authorization_service::AuthorizationServiceImpl,
         file_storage_service::minio::FileStorageMinioImpl,
         image_service::ImageServiceImpl,
-        optimizer_service::{self, OptimizerServiceRImageImpl},
+        optimizer_service::OptimizerServiceRImageImpl,
         token_service::TokenServiceJWTImpl,
     },
 };

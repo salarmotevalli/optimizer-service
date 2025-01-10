@@ -8,7 +8,7 @@ serde = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 futures-lite = "*"
 lapin = "2.5.0"
-async-trait = "0.1.83"
+async-trait = "0.1.85"
 tokio = { version = "1.42.0", features = ["rt-multi-thread"] }
 actix-web = "4"
 jsonwebtoken = "9"
@@ -16,36 +16,25 @@ env_logger= "0.11.6"
 actix-multipart = "0.7.2"
 figment = { version = "0.10", features = ["yaml", "env"] }
 clap = { version = "4.5.23", features = ["derive"] }
-rimage = { version="0.11.0-next.3", features=["icc"]}
+
+rimage = { version="0.11.0-next.3", default-features = true, features = ["icc"]}
+
 zune-core = "0.5.0-rc2"
-zune-image = { version = "0.5.0-rc0", default-features = false }
+
 async-nats = "0.38.0"
 aws-sdk-s3 = "1.68.0"
 aws-config = {  version = "1.5.13", features = ["behavior-version-latest"] }
 
-mozjpeg = { version = "0.10.10", default-features = false, features = [
-    "with_simd",
-] }
-oxipng = { version = "9.1", default-features = false, features = [
-    "zopfli",
-    "filetime",
-] }
-webp = { version = "0.3.0", default-features = false }
-ravif = { version = "0.11.10" }
+
+fast_image_resize = { version = "3.0.4" }
+zune-imageprocs = { version = "0.5.0-rc0", features = [
+    "exif",
+]}
 libavif = { version = "0.14.0", default-features = false, features = [
     "codec-aom",
 ] }
 
-lcms2 = { version = "6.1.0" }
-tiff = { version = "0.9.1", default-features = false }
-
-fast_image_resize = { version = "3.0.4" }
-
-zune-imageprocs = { version = "0.5.0-rc0", features = [
-    "exif",
-]}
-
-
+zune-image = { version = "0.5.0-rc0" }
 
 
 
@@ -56,3 +45,8 @@ path = "src/bin/queue/main.rs"
 [[bin]]
 name = "http"
 path = "src/bin/http/main.rs"
+
+
+[[bin]]
+name = "test"
+path = "src/main.rs"

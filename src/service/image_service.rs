@@ -2,7 +2,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use crate::domain::entity::image::Image;
 use crate::domain::error::DomainResult;
 use crate::domain::param::file_storage_service_param::StoreParam;
 use crate::domain::param::image_service_param::*;

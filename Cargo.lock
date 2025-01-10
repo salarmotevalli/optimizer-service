@@ -629,9 +629,9 @@ checksum = "8b75356056920673b02621b35afd0f7dda9306d03c79a30f5c56c44cf256e3de"
 
 [[package]]
 name = "async-trait"
-version = "0.1.83"
+version = "0.1.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "721cae7de5c34fbb2acd27e21e6d2cf7b886dce0c27388d46c4e6c47ea4318dd"
+checksum = "3f934833b4b7233644e5848f235df3f57ed8c80f1528a26c3dfa13d2147fa056"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2588,6 +2588,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f5d4a7da358eff58addd2877a45865158f0d78c911d43a5784ceb7bbf52833b0"
 
 [[package]]
+name = "jpeg-encoder"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2fefe5a4fb12fa836172dc53cc36c37af693f6197ae702f931faad8774caf926"
+
+[[package]]
 name = "js-sys"
 version = "0.3.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2610,6 +2616,147 @@ dependencies = [
  "serde",
  "serde_json",
  "simple_asn1",
+]
+
+[[package]]
+name = "jxl-bitstream"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5855ff16398ffbcf81fee52c41ca65326499c8764b21bb9952c367ace98995fb"
+dependencies = [
+ "tracing",
+]
+
+[[package]]
+name = "jxl-coding"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da5b5093904e940bc11ef50e872c7bdf7b6e88653f012b925f8479daf212b5c9"
+dependencies = [
+ "jxl-bitstream",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-color"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0cb1c31e10054079df585633fc14fb9e4c96565c58c05b983c502e2472b57fa0"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-coding",
+ "jxl-grid",
+ "jxl-threadpool",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-frame"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e35b289aa0f24044167d83a1c29ae2b99210c5082ab7e3e90dacbcae818aa0a2"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-coding",
+ "jxl-grid",
+ "jxl-image",
+ "jxl-modular",
+ "jxl-threadpool",
+ "jxl-vardct",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-grid"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70b96735a85299a6bce8664643fcb759f29ea73ce344a90b6f7de9b92a8e9b2d"
+dependencies = [
+ "tracing",
+]
+
+[[package]]
+name = "jxl-image"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b31b17ed3bd0e3b65e7b06628f5930e009dda6cd17638cf5159a20a3feedec6"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-color",
+ "jxl-grid",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-modular"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da3b9fb8f46e63a14ecedefbd0f873b04162aaf8a09676b630c31bc8dadc4638"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-coding",
+ "jxl-grid",
+ "jxl-threadpool",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-oxide"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ba1ee3895e6c62b131994807b1ee6d179013613a86c01c203369af8d1e8d2f0"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-color",
+ "jxl-frame",
+ "jxl-grid",
+ "jxl-image",
+ "jxl-render",
+ "jxl-threadpool",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-render"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "203a79b3025b86f875cc97a6f39e1fcc6314f915b2f6b69f767fca45fd482a11"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-coding",
+ "jxl-color",
+ "jxl-frame",
+ "jxl-grid",
+ "jxl-image",
+ "jxl-modular",
+ "jxl-threadpool",
+ "jxl-vardct",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-threadpool"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d2860c68899a3c6266044fc26c6a0041e9f27145f58cc69b6eedc1b77f5ee13"
+dependencies = [
+ "rayon",
+ "rayon-core",
+ "tracing",
+]
+
+[[package]]
+name = "jxl-vardct"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16af82a1ad770887cad720bfd3cc6a6d023faf377036989a24cf2c6538b649e0"
+dependencies = [
+ "jxl-bitstream",
+ "jxl-coding",
+ "jxl-grid",
+ "jxl-modular",
+ "jxl-threadpool",
+ "tracing",
 ]
 
 [[package]]
@@ -3235,18 +3382,18 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
 name = "pin-project"
-version = "1.1.7"
+version = "1.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be57f64e946e500c8ee36ef6331845d40a93055567ec57e8fae13efd33759b95"
+checksum = "1e2ec53ad785f4d35dac0adea7f7dc6f1bb277ad84a680c7afefeae05d1f5916"
 dependencies = [
  "pin-project-internal",
 ]
 
 [[package]]
 name = "pin-project-internal"
-version = "1.1.7"
+version = "1.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c0f5fad0874fc7abcd4d750e76917eaebbecaa2c20bde22e1dbeeba8beb758c"
+checksum = "d56a66c0c55993aa927429d0f8a0abfd74f084e4d9c192cffed01e418d83eefb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3812,7 +3959,7 @@ dependencies = [
  "openssl-probe",
  "rustls-pki-types",
  "schannel",
- "security-framework 3.1.0",
+ "security-framework 3.2.0",
 ]
 
 [[package]]
@@ -3940,9 +4087,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework"
-version = "3.1.0"
+version = "3.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81d3f8c9bfcc3cbb6b0179eb57042d75b1582bdc65c3cb95f3fa999509c03cbc"
+checksum = "271720403f46ca04f7ba6f55d438f8bd878d6b8ca0a1046e8228c4145bcbb316"
 dependencies = [
  "bitflags 2.6.0",
  "core-foundation 0.10.0",
@@ -3953,9 +4100,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework-sys"
-version = "2.13.0"
+version = "2.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1863fd3768cd83c56a7f60faa4dc0d403f1b6df0a38c3c25f44b7894e45370d5"
+checksum = "49db231d56a190491cb4aeda9527f1ad45345af50b0851622a7adb8c03b01c32"
 dependencies = [
  "core-foundation-sys",
  "libc",
@@ -4079,17 +4226,11 @@ dependencies = [
  "futures-lite 2.5.0",
  "jsonwebtoken",
  "lapin",
- "lcms2",
  "libavif",
- "mozjpeg",
- "oxipng",
- "ravif",
  "rimage",
  "serde",
  "serde_json",
- "tiff",
  "tokio",
- "webp",
  "zune-core",
  "zune-image",
  "zune-imageprocs",
@@ -4678,9 +4819,9 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "uuid"
-version = "1.11.0"
+version = "1.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8c5f0a0af699448548ad1a2fbf920fb4bee257eae39953ba95cb84891a0446a"
+checksum = "b913a3b5fe84142e269d63cc62b64319ccaf89b748fc31fe025177f767a756c4"
 
 [[package]]
 name = "v_frame"
@@ -5187,10 +5328,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "zune-bmp"
+version = "0.5.0-rc4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42da113b25df89826a7a8a026bccbaeca252e0e21e6cddbd1caabc1ca2bd948d"
+dependencies = [
+ "log",
+ "zune-core",
+]
+
+[[package]]
 name = "zune-core"
 version = "0.5.0-rc2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fa5491574238487afaf76a17d1907b47eaace69e97720b8486d584dfca013dc"
+dependencies = [
+ "log",
+ "serde",
+]
+
+[[package]]
+name = "zune-farbfeld"
+version = "0.5.0-rc0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fef14b3263749b04cb96812a5c9d8aee75766ddb956b05d3adc96b1c7bbb1d8"
+dependencies = [
+ "zune-core",
+]
+
+[[package]]
+name = "zune-hdr"
+version = "0.5.0-rc0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a081557738c083bd74b56ebc7b7ccd25f5df602c05bc755b497fe2df00535867"
+dependencies = [
+ "zune-core",
+]
 
 [[package]]
 name = "zune-image"
@@ -5199,8 +5372,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c29cd015d9786939132d9ffc1400f5fc4000dae1b6865c916376f22899e0421c"
 dependencies = [
  "bytemuck",
+ "jpeg-encoder",
+ "jxl-oxide",
  "kamadak-exif",
+ "serde",
+ "zune-bmp",
  "zune-core",
+ "zune-farbfeld",
+ "zune-hdr",
+ "zune-jpeg",
+ "zune-jpegxl",
+ "zune-png",
+ "zune-ppm",
+ "zune-psd",
+ "zune-qoi",
 ]
 
 [[package]]
@@ -5212,4 +5397,68 @@ dependencies = [
  "kamadak-exif",
  "zune-core",
  "zune-image",
+]
+
+[[package]]
+name = "zune-inflate"
+version = "0.2.54"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73ab332fe2f6680068f3582b16a24f90ad7096d5d39b974d1c0aff0125116f02"
+dependencies = [
+ "simd-adler32",
+]
+
+[[package]]
+name = "zune-jpeg"
+version = "0.5.0-rc2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6e1b91c3b508b590945d61560be96449641b504a94f42f1a5594161b2d328ea"
+dependencies = [
+ "zune-core",
+]
+
+[[package]]
+name = "zune-jpegxl"
+version = "0.5.0-rc0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81b3cc985d2b4408af5be05fc5343825b3d155c2acd3bae2ca00f7f1bb671df2"
+dependencies = [
+ "zune-core",
+]
+
+[[package]]
+name = "zune-png"
+version = "0.5.0-rc1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ea7c0417bae97900becb562db25de02ff87847e11a0a2585ce863b896e7bcee"
+dependencies = [
+ "zune-core",
+ "zune-inflate",
+]
+
+[[package]]
+name = "zune-ppm"
+version = "0.5.0-rc0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d96c83382086052d04a7c477971a4e49ce0753c77be06e8323c67364ebfc80eb"
+dependencies = [
+ "zune-core",
+]
+
+[[package]]
+name = "zune-psd"
+version = "0.5.0-rc0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cff07a2b85fe8ebbe2fd4d4251abfc09d8ff9ca5f6eb2c49450cb3661ab3b1e6"
+dependencies = [
+ "zune-core",
+]
+
+[[package]]
+name = "zune-qoi"
+version = "0.5.0-rc0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b848a8889f256a62fe4352078ee74fd2eee06e44825695fe4bbdcd805f05ee00"
+dependencies = [
+ "zune-core",
 ]

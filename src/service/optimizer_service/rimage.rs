@@ -47,7 +47,7 @@ impl OptimizerServiceRImageImpl {
     ) -> DomainResult<OptResult> {
         let mut pipeline = Pipeline::<Image>::new();
 
-        let img = self.decode(&input)?;
+        let img = self.decode(&input).unwrap();
 
         let ext = match input.extension() {
             Some(e) => e,
@@ -60,7 +60,7 @@ impl OptimizerServiceRImageImpl {
         };
 
         let mut available_encoder = match ext.to_str().unwrap() {
-            "jpeg" => AvailableEncoders::MozJpeg(Box::new(self.get_jpg_encoder(quality))),
+            "jpeg" | "jpg" => AvailableEncoders::MozJpeg(Box::new(self.get_jpg_encoder(quality))),
             "png" => AvailableEncoders::OxiPng(Box::new(self.get_png_encoder())),
             "avif" => AvailableEncoders::Avif(Box::new(self.get_avif_encoder(quality))),
             "webp" => AvailableEncoders::Webp(Box::new(self.get_webp_encoder(quality))),
@@ -92,10 +92,10 @@ impl OptimizerServiceRImageImpl {
         })
     }
 
-    pub fn decode<P: AsRef<Path>>(&self, f: P) -> Result<Image, ImageErrors> {
-        Image::open(f.as_ref()).or_else(|e| {
+    pub fn decode(&self, f: &Path) -> Result<Image, ImageErrors> {
+        Image::open(f).or_else(|e| {
             if matches!(e, ImageErrors::ImageDecoderNotImplemented(_)) {
-                let mut file = File::open(f.as_ref())?;
+                let mut file = File::open(f)?;
 
                 {
                     let mut file_content = vec![];
@@ -114,7 +114,7 @@ impl OptimizerServiceRImageImpl {
                 }
 
                 {
-                    if f.as_ref()
+                    if f
                         .extension()
                         .is_some_and(|f| f.eq_ignore_ascii_case("webp"))
                     {
@@ -129,7 +129,7 @@ impl OptimizerServiceRImageImpl {
                 }
 
                 {
-                    if f.as_ref().extension().is_some_and(|f| {
+                    if f.extension().is_some_and(|f| {
                         f.eq_ignore_ascii_case("tiff") | f.eq_ignore_ascii_case("tif")
                     }) {
                         use rimage::codecs::tiff::TiffDecoder;

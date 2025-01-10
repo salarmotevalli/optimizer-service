@@ -11,7 +11,7 @@ use crate::{
     domain::{
         entity::{
             self,
-            image_specification::{self, ImageSpecification},
+            image_specification,
         },
         error::{DomainErr, ErrKind},
         param::{authorization_service_param::*, image_service_param::*},
@@ -40,14 +40,11 @@ pub async fn serve(container: Arc<Container>) -> std::io::Result<()> {
         .await
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-struct spec {}
-
 #[derive(Debug, MultipartForm)]
 pub struct UploadForm {
     #[multipart(limit = "5MB")]
     pub file: TempFile,
-    // pub params: Json<image_specification::ImageSpecification>,
+    pub specifications: Json<image_specification::ImageSpecification>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -71,8 +68,7 @@ async fn upload_image(
 
     let store_image_param = StoreImageInfoParam {
         image: image.clone(),
-        // specification: form.params.into_inner(),
-        specification: ImageSpecification::default(),
+        specification: form.specifications.into_inner(),
     };
 
     let auth_param = AuthorizeImageUploadParam {
@@ -80,11 +76,11 @@ async fn upload_image(
         image,
     };
 
-    container
+    let _authorization = container
         .authorization_service
         .authorize_image_upload(auth_param)?;
 
-    form.file
+    let _persist_file = form.file
         .file
         .persist(&path)
         .map_err(|e| DomainErr::new(e.to_string(), ErrKind::UnprocessableErr))?;

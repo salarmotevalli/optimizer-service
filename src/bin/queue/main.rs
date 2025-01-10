@@ -7,7 +7,7 @@ use serviceorented::{
     service::{
         file_storage_service::minio::FileStorageMinioImpl,
         image_service::ImageServiceImpl,
-        optimizer_service::{self, OptimizerServiceRImageImpl},
+        optimizer_service::OptimizerServiceRImageImpl,
     },
 };
 use tokio;
