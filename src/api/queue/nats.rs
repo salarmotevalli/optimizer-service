@@ -1,10 +1,9 @@
 use std::{str::from_utf8, sync::Arc};
 
 use futures_lite::StreamExt;
-use lapin::options::*;
 
 use crate::{
-    domain::{param::image_service_param::OptImgParam, service::ImageService},
+    domain::{param::image_service_param::*, service::ImageService},
     infra::queue::nats::image_queue::ImageQueueNatsConfig,
 };
 
@@ -36,11 +35,13 @@ impl QueueConsumer {
             .take(1);
 
         while let Some(message) = subscription.next().await {
-            
             let pl = from_utf8(&message.payload)?;
-            let image_service_param = serde_json::from_str::<OptImgParam>(&pl).unwrap();
-            
-            self.image_service.opt_img(image_service_param).await.unwrap();
+            let image_service_param = serde_json::from_str::<OptimizeImageParam>(&pl).unwrap();
+
+            self.image_service
+                .optimize_image(image_service_param)
+                .await
+                .unwrap();
         }
 
         Ok(())

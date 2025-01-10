@@ -1,11 +1,11 @@
-use std::{fmt::format, sync::Arc};
+use std::sync::Arc;
 
 use async_nats::Client;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
-    error::DomainResult, param::image_service_param::OptImgParam, queue::ImageQueue,
+    error::DomainResult, param::image_service_param::*, queue::ImageQueue,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -26,7 +26,7 @@ impl ImageQueueNatsImpl {
 
 #[async_trait]
 impl ImageQueue for ImageQueueNatsImpl {
-    async fn push_image(&self, param: OptImgParam) -> DomainResult<()> {
+    async fn push_image(&self, param: OptimizeImageParam) -> DomainResult<()> {
         let serde_param = serde_json::to_string(&param)?;
 
         self.client

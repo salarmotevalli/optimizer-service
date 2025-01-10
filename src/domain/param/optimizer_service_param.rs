@@ -1,3 +1,14 @@
-pub struct ProcessParam{}
+use serde::{Deserialize, Serialize};
 
-pub struct ProcessResult{}
+use crate::domain::entity::{image::Image, image_specification::ImageSpecification};
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ProcessParam {
+    pub image: Image,
+    pub specification: ImageSpecification,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ProcessResult {
+    pub data: Vec<u8>
+}

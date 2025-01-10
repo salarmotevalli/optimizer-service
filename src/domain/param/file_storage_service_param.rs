@@ -1,5 +1,6 @@
 pub struct StoreParam {
-    pub data: Vec<u8>
+    pub data: Vec<u8>,
+    pub name: String,
 }
 
-pub struct StoreResult{}
+pub struct StoreResult {}

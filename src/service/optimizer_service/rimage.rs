@@ -1,112 +1,261 @@
-use std::{io::Cursor, path::Path, slice, str::FromStr, sync::Arc};
-use rimage::{config::{Codec, EncoderConfig, QuantizationConfig, ResizeConfig, ResizeType}, image::ImageResult, Decoder, Encoder};
-use zune_image::image::Image;
-use crate::domain::{error::{DomainErr, DomainResult, ErrKind}, param::{file_storage_service_param::StoreParam, image_service_param::OptImgParam, optimizer_service_param::ProcessResult}, service::{FileStorageService, OptimizerService}};
+use std::{
+    fs::File,
+    io::{Read, Seek, SeekFrom},
+    path::Path,
+};
 
-pub struct OptimizerServiceRImageImpl {
-    pub file_storage_service: Arc<dyn FileStorageService>
+use crate::domain::{
+    error::{DomainErr, DomainResult},
+    param::optimizer_service_param::*,
+    service::OptimizerService,
+};
+
+use async_trait::async_trait;
+use rimage::{
+    codecs::{
+        avif::AvifEncoder, mozjpeg::MozJpegEncoder, oxipng::OxiPngEncoder, webp::WebPEncoder,
+    },
+    operations::icc::ApplySRGB,
+};
+
+use zune_core::{bit_depth::BitDepth, bytestream::ZByteWriterTrait, colorspace::ColorSpace};
+use zune_image::{
+    codecs::ImageFormat,
+    core_filters::{colorspace::ColorspaceConv, depth::Depth},
+    errors::ImageErrors,
+    image::Image,
+    pipelines::Pipeline,
+    traits::{EncoderTrait, OperationsTrait},
+};
+use zune_imageprocs::auto_orient::AutoOrient;
+
+pub struct OptimizerServiceRImageImpl {}
+
+#[derive(Default)]
+struct OptResult {
+    image: Vec<u8>,
+
 }
 
 impl OptimizerServiceRImageImpl {
-    pub fn prepair_conf(
+    fn optimize(
         &self,
+        input: &Path,
         quality: f32,
-        codec: &str,
-        filter: &str,
-        quantization: Option<u8>,
-        dithering: Option<f32>,
-        width: Option<usize>,
+        weight: Option<usize>,
         height: Option<usize>,
-    ) -> DomainResult<EncoderConfig> {
-        let c = Codec::from_str(codec).map_err(|e| DomainErr::new(e, ErrKind::UnExpectedErr))?;
+    ) -> DomainResult<OptResult> {
+        let mut pipeline = Pipeline::<Image>::new();
 
-        let mut quantization_config = QuantizationConfig::new();
+        let img = self.decode(&input)?;
 
-        if let Some(quality) = quantization {
-            quantization_config = quantization_config.with_quality(quality)?
+        let ext = match input.extension() {
+            Some(e) => e,
+            None => {
+                return Err(DomainErr::new(
+                    "cannot find extention".to_string(),
+                    crate::domain::error::ErrKind::UnprocessableErr,
+                ));
+            }
+        };
+
+        let mut available_encoder = match ext.to_str().unwrap() {
+            "jpeg" => AvailableEncoders::MozJpeg(Box::new(self.get_jpg_encoder(quality))),
+            "png" => AvailableEncoders::OxiPng(Box::new(self.get_png_encoder())),
+            "avif" => AvailableEncoders::Avif(Box::new(self.get_avif_encoder(quality))),
+            "webp" => AvailableEncoders::Webp(Box::new(self.get_webp_encoder(quality))),
+            name => panic!("Encoder \"{name}\" not found"),
+        };
+
+        pipeline.chain_operations(Box::new(Depth::new(BitDepth::Eight)));
+        pipeline.chain_operations(Box::new(ColorspaceConv::new(ColorSpace::RGBA)));
+
+        pipeline.chain_operations(Box::new(AutoOrient));
+        pipeline.chain_operations(Box::new(ApplySRGB));
+
+        if weight.is_some() || height.is_some() {
+            let resize_op = self.resize_operation(&img, (weight, height));
+
+            pipeline.chain_operations(resize_op);
         }
 
-        if let Some(dithering) = dithering {
-            quantization_config = quantization_config.with_dithering(dithering / 100.0)?
-        }
+        pipeline.chain_decoder(img);
 
-        let resize_filter = ResizeType::from_str(filter).map_err(|e| DomainErr::new(e, ErrKind::UnExpectedErr))?;
+        pipeline.advance_to_end()?;
 
-        let mut resize_config = ResizeConfig::new(resize_filter);
+        let mut image = Vec::new();
 
-        if let Some(w) = width {
-            resize_config = resize_config.with_width(w);
-        }
+        available_encoder.encode(&pipeline.images()[0], &mut image)?;
 
-        if let Some(h) = height {
-            resize_config = resize_config.with_height(h);
-        }
-
-        let mut conf = EncoderConfig::new(c).with_quality(quality)?;
-
-        if quantization.is_some() || dithering.is_some() {
-            conf = conf.with_quantization(quantization_config);
-        }
-
-        if width.is_some() || height.is_some() {
-            conf = conf.with_resize(resize_config);
-        }
-
-        Ok(conf)
+        Ok(OptResult {
+            image,
+        })
     }
 
-    fn optimize(&self, in_path: &Path, conf: EncoderConfig) -> ImageResult<Vec<u8>> {
-        let decoder = Decoder::from_path(in_path)?;
-        let image = decoder.decode()?;
+    pub fn decode<P: AsRef<Path>>(&self, f: P) -> Result<Image, ImageErrors> {
+        Image::open(f.as_ref()).or_else(|e| {
+            if matches!(e, ImageErrors::ImageDecoderNotImplemented(_)) {
+                let mut file = File::open(f.as_ref())?;
 
-        let buf: Box<[u8]> = vec![0u8].into_boxed_slice(); // Create a Box<[u8]>
-        let ptr = buf.as_ptr();
-        let len = buf.len();
-        
-        // Prevent the Box from deallocating the memory when it goes out of scope.
-        std::mem::forget(&buf);
+                {
+                    let mut file_content = vec![];
 
-      
-        let cursor = Cursor::new(buf); // Create the Cursor
-            
-        let encoder = Encoder::new(cursor, image).with_config(conf);
-        
-        encoder.encode()?;
+                    file.read_to_end(&mut file_content)?;
+                    file.seek(SeekFrom::Start(0))?;
 
-        
-        unsafe {
-            let data = slice::from_raw_parts(ptr, len);
+                    if libavif::is_avif(&file_content) {
+                        use rimage::codecs::avif::AvifDecoder;
 
-            let _ = Box::from_raw(data.as_ptr() as *mut u8); // Deallocates when _ goes out of scope
+                        let decoder = AvifDecoder::try_new(file)?;
 
-            Ok(data.to_vec())
-        }   
+                        return Image::from_decoder(decoder);
+                    };
+                    file.seek(SeekFrom::Start(0))?;
+                }
+
+                {
+                    if f.as_ref()
+                        .extension()
+                        .is_some_and(|f| f.eq_ignore_ascii_case("webp"))
+                    {
+                        use rimage::codecs::webp::WebPDecoder;
+
+                        let decoder = WebPDecoder::try_new(file)?;
+
+                        return Image::from_decoder(decoder);
+                    }
+
+                    file.seek(SeekFrom::Start(0))?;
+                }
+
+                {
+                    if f.as_ref().extension().is_some_and(|f| {
+                        f.eq_ignore_ascii_case("tiff") | f.eq_ignore_ascii_case("tif")
+                    }) {
+                        use rimage::codecs::tiff::TiffDecoder;
+
+                        let decoder = TiffDecoder::try_new(file)?;
+
+                        return Image::from_decoder(decoder);
+                    }
+
+                    file.seek(SeekFrom::Start(0))?;
+                }
+
+                Err(ImageErrors::ImageDecoderNotImplemented(
+                    ImageFormat::Unknown,
+                ))
+            } else {
+                Err(e)
+            }
+        })
     }
-    
+
+    pub fn resize_operation(
+        &self,
+        img: &Image,
+        resize: (Option<usize>, Option<usize>),
+    ) -> Box<dyn OperationsTrait> {
+        use fast_image_resize::ResizeAlg;
+        use rimage::operations::resize::Resize;
+
+        let (mut o_w, mut o_h) = img.dimensions();
+
+        if let Some(w) = resize.0 {
+            o_w = w
+        }
+
+        if let Some(h) = resize.1 {
+            o_h = h
+        }
+
+        Box::new(Resize::new(o_w, o_h, ResizeAlg::Nearest))
+    }
+
+    fn get_png_encoder(&self) -> OxiPngEncoder {
+        use rimage::codecs::oxipng::OxiPngOptions;
+
+        let preset_level = 2;
+        let opts = OxiPngOptions::from_preset(preset_level);
+
+        OxiPngEncoder::new_with_options(opts)
+    }
+
+    fn get_webp_encoder(&self, quality: f32) -> WebPEncoder {
+        use rimage::codecs::webp::WebPOptions;
+
+        let mut options = WebPOptions::new().unwrap();
+
+        options.quality = quality;
+        WebPEncoder::new_with_options(options)
+    }
+
+    fn get_jpg_encoder(&self, quality: f32) -> MozJpegEncoder {
+        use rimage::codecs::mozjpeg::MozJpegOptions;
+
+        let mut opts = MozJpegOptions::default();
+
+        opts.quality = quality;
+
+        MozJpegEncoder::new_with_options(opts)
+    }
+
+    fn get_avif_encoder(&self, quality: f32) -> AvifEncoder {
+        use rimage::codecs::avif::AvifOptions;
+
+        let mut opts = AvifOptions::default();
+        opts.quality = quality;
+
+        AvifEncoder::new_with_options(opts)
+    }
 }
 
+pub enum AvailableEncoders {
+    MozJpeg(Box<MozJpegEncoder>),
+    OxiPng(Box<OxiPngEncoder>),
+    Avif(Box<AvifEncoder>),
+    Webp(Box<WebPEncoder>),
+}
+
+impl AvailableEncoders {
+    pub fn to_extension(&self) -> &'static str {
+        match self {
+            AvailableEncoders::MozJpeg(_) => "jpg",
+            AvailableEncoders::OxiPng(_) => "png",
+            AvailableEncoders::Avif(_) => "avif",
+            AvailableEncoders::Webp(_) => "webp",
+        }
+    }
+
+    pub fn encode<T: ZByteWriterTrait>(
+        &mut self,
+        img: &Image,
+        sink: T,
+    ) -> Result<usize, ImageErrors> {
+        match self {
+            AvailableEncoders::MozJpeg(enc) => enc.encode(img, sink),
+            AvailableEncoders::OxiPng(enc) => enc.encode(img, sink),
+            AvailableEncoders::Avif(enc) => enc.encode(img, sink),
+            AvailableEncoders::Webp(enc) => enc.encode(img, sink),
+        }
+    }
+}
+
+#[async_trait]
 impl OptimizerService for OptimizerServiceRImageImpl {
-    fn process(&self, param: OptImgParam) -> DomainResult<ProcessResult> {
+    async fn process(&self, param: ProcessParam) -> DomainResult<ProcessResult> {
         let image_path = format!("./tmp/{}", param.image.full_name);
-        
-        let conf = self.prepair_conf(
+
+        let res = self.optimize(
+            Path::new(&image_path), 
             param.specification.quality, 
-            &param.image.ext(),
-            &param.specification.filter,
-            param.specification.quantization,
-            param.specification.dithering,
             param.specification.width, 
             param.specification.height
         )?;
 
-        let res = self.optimize(
-            Path::new(&image_path), 
-            conf
-        )?;
+        Ok(ProcessResult{
+            data: res.image
+        })
 
-        let store_param = StoreParam {data: res};
-        self.file_storage_service.store(store_param);
-
-        Ok(ProcessResult{})
     }
 }

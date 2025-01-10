@@ -4,7 +4,7 @@ use futures_lite::StreamExt;
 use lapin::options::*;
 
 use crate::{
-    domain::{param::image_service_param::OptImgParam, service::ImageService},
+    domain::{param::image_service_param::*, service::ImageService},
     infra::queue::rabbitmq::{RabbitMqImpl, image_queue::ImageQueueRabbitMQConfig},
 };
 
@@ -40,14 +40,15 @@ impl QueueConsumer {
         println!("Connected to RabbitMQ");
 
         while let Some(d) = consumer.next().await {
-            if let Err(e) = d {
+            if let Err(_e) = d {
                 continue;
             }
 
             let delivery = d.unwrap();
 
             let message: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&delivery.data);
-            let image_service_param: Result<OptImgParam, serde_json::Error> = serde_json::from_str::<OptImgParam>(&message);
+            let image_service_param: Result<OptimizeImageParam, serde_json::Error> =
+                serde_json::from_str::<OptimizeImageParam>(&message);
 
             if let Err(e) = image_service_param {
                 let _ = delivery.reject(BasicRejectOptions { requeue: false });
@@ -57,7 +58,7 @@ impl QueueConsumer {
 
             let result = self
                 .image_service
-                .opt_img(image_service_param.unwrap())
+                .optimize_image(image_service_param.unwrap())
                 .await;
 
             match result {

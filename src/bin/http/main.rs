@@ -4,9 +4,13 @@ use serviceorented::{
     api::http::serve,
     app_config,
     container::Container,
-    infra::queue::nats::{image_queue::ImageQueueNatsImpl, NatsQueue},
+    infra::queue::nats::{NatsQueue, image_queue::ImageQueueNatsImpl},
     service::{
-        authorization_service::AuthorizationServiceImpl, file_storage_service::minio::FileStorageMinioImpl, image_service::ImageServiceImpl, optimizer_service::{self, OptimizerServiceRImageImpl}, token_service::TokenServiceJWTImpl
+        authorization_service::AuthorizationServiceImpl,
+        file_storage_service::minio::FileStorageMinioImpl,
+        image_service::ImageServiceImpl,
+        optimizer_service::{self, OptimizerServiceRImageImpl},
+        token_service::TokenServiceJWTImpl,
     },
 };
 
@@ -35,10 +39,13 @@ async fn main() -> std::io::Result<()> {
         cnf.image_queue_nats_config.clone(),
     );
 
-    let file_storage_service = FileStorageMinioImpl{config: cnf.minio_config.clone()};
-    let optimizer_service = OptimizerServiceRImageImpl{file_storage_service: Arc::new(file_storage_service)};
+    let file_storage_service = FileStorageMinioImpl {
+        config: cnf.minio_config.clone(),
+    };
+    let optimizer_service = OptimizerServiceRImageImpl{};
 
     let image_service = Arc::new(ImageServiceImpl {
+        file_storage_service: Arc::new(file_storage_service),
         optimizer_service: Arc::new(optimizer_service),
         image_queue: Arc::new(image_queue),
     });

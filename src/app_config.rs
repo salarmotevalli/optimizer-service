@@ -1,6 +1,6 @@
 use crate::{
     api::http::HttpServerConfig,
-    infra::queue::nats::{image_queue::ImageQueueNatsConfig, NatsConfig},
+    infra::queue::nats::{NatsConfig, image_queue::ImageQueueNatsConfig},
     service::{authorization_service, file_storage_service::minio::MinioConfig, token_service},
 };
 use figment::providers::{Env, Format, Yaml};
@@ -22,7 +22,7 @@ pub struct Config {
     pub image_queue_nats_config: ImageQueueNatsConfig,
 
     // minio
-    pub minio_config: MinioConfig
+    pub minio_config: MinioConfig,
 }
 
 impl Config {

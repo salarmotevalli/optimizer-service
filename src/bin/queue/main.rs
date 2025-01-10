@@ -3,8 +3,12 @@ use std::sync::Arc;
 use serviceorented::{
     api::queue::nats::QueueConsumer,
     app_config::Config,
-    infra::queue::nats::{image_queue::ImageQueueNatsImpl, NatsQueue},
-    service::{file_storage_service::minio::FileStorageMinioImpl, image_service::ImageServiceImpl, optimizer_service::{self, OptimizerServiceRImageImpl}},
+    infra::queue::nats::{NatsQueue, image_queue::ImageQueueNatsImpl},
+    service::{
+        file_storage_service::minio::FileStorageMinioImpl,
+        image_service::ImageServiceImpl,
+        optimizer_service::{self, OptimizerServiceRImageImpl},
+    },
 };
 use tokio;
 
@@ -27,11 +31,13 @@ fn main() {
         let image_queue =
             ImageQueueNatsImpl::new(client.clone(), cnf.image_queue_nats_config.clone());
 
-        let file_storage_service = FileStorageMinioImpl{config: cnf.minio_config.clone()};
-        let optimizer_service = OptimizerServiceRImageImpl{file_storage_service: Arc::new(file_storage_service)};
-        
-        
+        let file_storage_service = FileStorageMinioImpl {
+            config: cnf.minio_config.clone(),
+        };
+        let optimizer_service = OptimizerServiceRImageImpl {};
+
         let image_service = ImageServiceImpl {
+        file_storage_service: Arc::new(file_storage_service),
             optimizer_service: Arc::new(optimizer_service),
             image_queue: Arc::new(image_queue),
         };

@@ -9,7 +9,10 @@ use std::sync::Arc;
 use crate::{
     container::Container,
     domain::{
-        entity::{self, image_specification::{self, ImageSpecification}},
+        entity::{
+            self,
+            image_specification::{self, ImageSpecification},
+        },
         error::{DomainErr, ErrKind},
         param::{authorization_service_param::*, image_service_param::*},
     },

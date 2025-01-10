@@ -27,7 +27,6 @@ pub struct Console {
 impl Console {
     pub fn execute(&self) -> Result<(), std::io::Error> {
         let cli = Cli::parse();
-
         match cli.command {
             Commands::Opt { image } => self.handle_opt(image, cli.format, cli.width, cli.height),
             _ => unreachable!(),

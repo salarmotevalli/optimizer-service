@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{
     error::{DomainErr, DomainResult, ErrKind},
-    param::image_service_param::OptImgParam,
+    param::image_service_param::*,
     queue::ImageQueue,
 };
 
@@ -37,7 +37,7 @@ impl ImageQueueRabbitMQImpl {
 
 #[async_trait]
 impl ImageQueue for ImageQueueRabbitMQImpl {
-    async fn push_image(&self, param: OptImgParam) -> DomainResult<()> {
+    async fn push_image(&self, param: OptimizeImageParam) -> DomainResult<()> {
         let channel = self.conn.create_channel().await?;
         let _exchange = self
             .declare_exchange(&channel, &self.config.exchange_name)

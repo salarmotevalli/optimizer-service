@@ -1,8 +1,11 @@
 use async_trait::async_trait;
 
-use crate::domain::{error::DomainResult, param::{image_service_param::OptImgParam, optimizer_service_param::ProcessResult}};
+use crate::domain::{
+    error::DomainResult,
+    param::optimizer_service_param::*,
+};
 
 #[async_trait]
 pub trait OptimizerService: Send + Sync {
-    fn process(&self,  param: OptImgParam) -> DomainResult<ProcessResult>;
+    async fn process(&self, param: ProcessParam) -> DomainResult<ProcessResult>;
 }
