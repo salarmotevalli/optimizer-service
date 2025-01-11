@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"getway/param/imageparam"
 	"net/http"
 )
 
@@ -19,13 +20,8 @@ func New(c OptimizerConfig) Optimizer {
 	return Optimizer {config: c}
 }
 
-type SignUrlParam struct {
-	ImageSize 	string `json="image_size"`
-	ImageName 	string `json="image_name"`
-	ImageFormat string `json="image_format"`
-}
 
-func (o *Optimizer) SignUrl(param SignUrlParam) (string, error) {
+func (o *Optimizer) SignUrl(param imageparam.SignUrlRequest) (string, error) {
 	signUrl := fmt.Sprintf("%s/%s", o.config.OptimizerUrl, "sign-url") 
 	
 	body, err := json.Marshal(param)

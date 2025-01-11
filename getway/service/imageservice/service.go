@@ -10,7 +10,7 @@ type ImageRepository interface {
 }
 
 type OptimizerService interface {
-	SignUrl() (string, error)
+	SignUrl(param imageparam.SignUrlRequest) (string, error)
 }
 
 type ImageService struct {
@@ -25,7 +25,7 @@ func NewImageService(repo ImageRepository) ImageService {
 func (s *ImageService) SignUrl(req imageparam.SignUrlRequest) (imageparam.SignUrlResponse, error) {
 	const op = "imageservice.SignUrl"
 	
-	url, err := s.optimizer.SignUrl()
+	url, err := s.optimizer.SignUrl(req)
 	if err != nil {
 		return imageparam.SignUrlResponse{}, richerror.New(op).
 		WithErr(err).

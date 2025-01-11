@@ -15,6 +15,7 @@ type ImageHandler struct {
 
 func (h ImageHandler) SignUrl(c echo.Context) error {
 	var request imageparam.SignUrlRequest
+
 	if err := c.Bind(&request); err != nil {
 		msg, code := httpmsg.Error(err)
 		return c.JSON(code, echo.Map{

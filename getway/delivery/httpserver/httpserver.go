@@ -3,7 +3,8 @@ package httpserver
 import (
 	"errors"
 	"getway/config"
-	// internalMiddleware "getway/delivery/httpserver/middleware"
+	"getway/delivery/httpserver/imagehandler"
+	internalMiddleware "getway/delivery/httpserver/middleware"
 	"getway/delivery/httpserver/userhandler"
 	"log/slog"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 type Server struct {
 	config       config.Config
 	userHandler  userhandler.UserHandler
+	imageHandler imagehandler.ImageHandler
 }
 
 func New(cnf config.Config,
@@ -38,6 +40,9 @@ func (s Server) Serve() {
 	userGroup := e.Group("/users")
 	userGroup.POST("/register", s.userHandler.Register)
 	userGroup.POST("/login", s.userHandler.Login)
+
+	imageGroup := e.Group("/images", internalMiddleware.Auth(s.userHandler.AuthSvc, s.config.AuthConfig))
+	imageGroup.GET("/optimize/sign-url", s.imageHandler.SignUrl)
 
 	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("failed to start server", "error", err)
