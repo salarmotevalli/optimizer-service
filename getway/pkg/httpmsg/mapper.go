@@ -1,7 +1,7 @@
 package httpmsg
 
 import (
-	"getway/pkg/errmsg"
+	// "getway/pkg/errmsg"
 	"getway/pkg/richerror"
 	"net/http"
 )
@@ -13,9 +13,9 @@ func Error(err error) (message string, code int) {
 		code := mapKindToHTTPStatusCode(re.Kind())
 
 		// we should not expose unexpected error messages
-		if code >= 500 {
-			msg = errmsg.ErrorMsgSomethingWentWrong
-		}
+		// if code >= 500 {
+		// 	msg = errmsg.ErrorMsgSomethingWentWrong
+		// }
 
 		return msg, code
 	default:
