@@ -4,7 +4,7 @@ import (
 	"errors"
 	"getway/config"
 	"getway/delivery/httpserver/imagehandler"
-	// internalMiddleware "getway/delivery/httpserver/middleware"
+	internalMiddleware "getway/delivery/httpserver/middleware"
 	"getway/delivery/httpserver/userhandler"
 	"log/slog"
 	"net/http"
@@ -43,8 +43,7 @@ func (s Server) Serve() {
 	userGroup.POST("/register", s.userHandler.Register)
 	userGroup.POST("/login", s.userHandler.Login)
 
-	imageGroup := e.Group("/images")
-	// imageGroup := e.Group("/images", internalMiddleware.Auth(s.userHandler.AuthSvc, s.config.AuthConfig))
+	imageGroup := e.Group("/images", internalMiddleware.Auth(s.userHandler.AuthSvc, s.config.AuthConfig))
 	imageGroup.GET("/optimize/sign-url", s.imageHandler.SignUrl)
 
 	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
