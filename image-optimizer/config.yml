@@ -11,7 +11,7 @@ authorization_service_config:
     - "webp"
 
 http_server_config:
-  port: 8080
+  port: 5000
   workers: 2
 
 rabbit_mq_config:
