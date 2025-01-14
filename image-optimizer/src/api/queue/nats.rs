@@ -37,7 +37,7 @@ impl QueueSubscriber {
         while let Some(message) = subscription.next().await {
             let pl = from_utf8(&message.payload)?;
             
-            let image_service_param = serde_json::from_str::<OptimizeImageParam>(&pl);
+            let image_service_param = serde_json::from_str::<OptimizeImageParam>(pl);
             if image_service_param.is_err() {
                 // TODO: add log
                 continue;

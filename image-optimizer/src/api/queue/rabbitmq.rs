@@ -51,7 +51,7 @@ impl QueueConsumer {
                 serde_json::from_str::<OptimizeImageParam>(&message);
 
             if let Err(e) = image_service_param {
-                let _ = delivery.reject(BasicRejectOptions { requeue: false });
+                let _ = delivery.reject(BasicRejectOptions { requeue: false }).await;
                 println!("Error: {}", e);
                 continue;
             }

@@ -46,7 +46,3 @@ path = "src/bin/queue/main.rs"
 name = "http"
 path = "src/bin/http/main.rs"
 
-
-[[bin]]
-name = "test"
-path = "src/main.rs"

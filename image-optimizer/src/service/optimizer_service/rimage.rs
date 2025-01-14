@@ -47,7 +47,7 @@ impl OptimizerServiceRImageImpl {
     ) -> DomainResult<OptResult> {
         let mut pipeline = Pipeline::<Image>::new();
 
-        let img = self.decode(&input).unwrap();
+        let img = self.decode(input).unwrap();
 
         let ext = match input.extension() {
             Some(e) => e,
@@ -193,20 +193,17 @@ impl OptimizerServiceRImageImpl {
     fn get_jpg_encoder(&self, quality: f32) -> MozJpegEncoder {
         use rimage::codecs::mozjpeg::MozJpegOptions;
 
-        let mut opts = MozJpegOptions::default();
-
-        opts.quality = quality;
-
-        MozJpegEncoder::new_with_options(opts)
+        MozJpegEncoder::new_with_options(
+            MozJpegOptions{quality, ..Default::default()}
+        )
     }
 
     fn get_avif_encoder(&self, quality: f32) -> AvifEncoder {
         use rimage::codecs::avif::AvifOptions;
-
-        let mut opts = AvifOptions::default();
-        opts.quality = quality;
-
-        AvifEncoder::new_with_options(opts)
+        
+        AvifEncoder::new_with_options(
+            AvifOptions{quality, ..Default::default()}
+        )
     }
 }
 

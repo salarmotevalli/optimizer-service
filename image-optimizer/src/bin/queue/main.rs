@@ -10,7 +10,6 @@ use serviceorented::{
         optimizer_service::OptimizerServiceRImageImpl,
     },
 };
-use tokio;
 
 fn main() {
     let rt = tokio::runtime::Builder::new_multi_thread()
