@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::domain::entity::image::Image;
@@ -19,6 +21,10 @@ pub struct OptimizeImageParam {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct OptimizeImageResult {
-    
+pub struct OptimizeImageResult {}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ProcessResultParam {
+    pub image: Image,
+    pub err: Option<HashMap<String, String>>
 }

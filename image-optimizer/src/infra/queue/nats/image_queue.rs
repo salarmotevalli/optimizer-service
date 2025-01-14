@@ -10,7 +10,8 @@ use crate::domain::{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ImageQueueNatsConfig {
-    pub namespace: String,
+    pub income_namespace: String,
+    pub result_namespace: String,
 }
 
 pub struct ImageQueueNatsImpl {
@@ -30,7 +31,17 @@ impl ImageQueue for ImageQueueNatsImpl {
         let serde_param = serde_json::to_string(&param)?;
 
         self.client
-            .publish(self.config.namespace.clone(), serde_param.into())
+            .publish(self.config.income_namespace.clone(), serde_param.into())
+            .await?;
+
+        Ok(())
+    }
+
+    async fn push_process_result(&self, param: ProcessResultParam) -> DomainResult<()> {
+        let serde_param = serde_json::to_string(&param)?;
+
+        self.client
+            .publish(self.config.result_namespace.clone(), serde_param.into())
             .await?;
 
         Ok(())

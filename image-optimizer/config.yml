@@ -27,7 +27,8 @@ image_queue_rabbitmq_config:
   consumer_tag: "image_optimization_consumer_tag"
 
 image_queue_nats_config:
-  namespace: 'image_optimization.income'
+  income_namespace: 'image_optimization.income'
+  result_namespace: 'image_optimization.result'
   
 
 minio_config:

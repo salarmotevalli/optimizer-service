@@ -7,14 +7,14 @@ use crate::{
     infra::queue::nats::image_queue::ImageQueueNatsConfig,
 };
 
-pub struct QueueConsumer {
+pub struct QueueSubscriber {
     config: ImageQueueNatsConfig,
     client: Arc<async_nats::Client>,
     // TODO: replace with container
     image_service: Arc<dyn ImageService>,
 }
 
-impl QueueConsumer {
+impl QueueSubscriber {
     pub fn new(
         config: ImageQueueNatsConfig,
         client: Arc<async_nats::Client>,
@@ -30,18 +30,22 @@ impl QueueConsumer {
     pub async fn subscribe(&self) -> Result<(), async_nats::Error> {
         let mut subscription = self
             .client
-            .subscribe(self.config.namespace.clone())
+            .subscribe(self.config.income_namespace.clone())
             .await?
             .take(1);
 
         while let Some(message) = subscription.next().await {
             let pl = from_utf8(&message.payload)?;
-            let image_service_param = serde_json::from_str::<OptimizeImageParam>(&pl).unwrap();
+            
+            let image_service_param = serde_json::from_str::<OptimizeImageParam>(&pl);
+            if image_service_param.is_err() {
+                // TODO: add log
+                continue;
+            }
 
-            self.image_service
-                .optimize_image(image_service_param)
-                .await
-                .unwrap();
+            let _res = self.image_service
+                .optimize_image(image_service_param.unwrap())
+                .await;
         }
 
         Ok(())

@@ -12,8 +12,10 @@ pub struct DomainErr {
 
 impl DomainErr {
     pub fn new(message: String, kind: ErrKind) -> Self {
-        Self { message, kind }
+        Self { message, kind}
     }
+
+    // TODO: pub with_meta()
 }
 
 impl Display for DomainErr {

@@ -57,10 +57,7 @@ impl ImageQueue for ImageQueueRabbitMQImpl {
             )
             .await?;
 
-        let payload = serde_json::ser::to_vec(&param).map_err(|e| DomainErr {
-            message: e.to_string(),
-            kind: ErrKind::UnExpectedErr,
-        })?;
+        let payload = serde_json::ser::to_vec(&param).map_err(|e| DomainErr::new(e.to_string(), ErrKind::UnExpectedErr))?;
 
         channel
             .basic_publish(
@@ -79,6 +76,10 @@ impl ImageQueue for ImageQueueRabbitMQImpl {
         );
 
         Ok(())
+    }
+
+    async fn push_process_result(&self, _param: ProcessResultParam) -> DomainResult<()> {
+        unimplemented!()
     }
 }
 

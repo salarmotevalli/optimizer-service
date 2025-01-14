@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
@@ -31,21 +32,58 @@ impl ImageServiceImpl {
 
 #[async_trait]
 impl ImageService for ImageServiceImpl {
-    async fn optimize_image(&self, param: OptimizeImageParam) -> DomainResult<OptimizeImageResult> {
-        
-        let res = self.optimizer_service.process(ProcessParam {
+    async fn optimize_image(&self, param: OptimizeImageParam) -> DomainResult<OptimizeImageResult> {    
+        let process_res = self.optimizer_service.process(ProcessParam {
             image: param.image.clone(),
             specification: param.specification
-        }).await?;
+        }).await;
+
+        
+        if let Err(e) = process_res {
+            let mut err: HashMap<String, String> = HashMap::new();          
+            err.insert("message".to_string(), e.message.clone());
+            
+            let param = ProcessResultParam {
+                image: param.image,
+                err: Some(err)
+            };
+
+            let _push_res_to_queue = self.image_queue.push_process_result(param).await?;
+
+            return Err(e);
+        }
 
 
         let s_param = StoreParam {
-            data: res.data,
-            name: self.image_new_name(param.image.full_name)
+            data: process_res.unwrap().data,
+            name: self.image_new_name(param.image.full_name.clone())
         };
 
-        self.file_storage_service.store(s_param).await?;
+        let u_res = self.file_storage_service.store(s_param).await;
+        if let Err(e) = u_res {
+            let mut err: HashMap<String, String> = HashMap::new();          
+            err.insert("message".to_string(), e.message.clone());
+            
+            let param = ProcessResultParam {
+                image: param.image,
+                err: Some(err)
+            };
+
+            // which error should return?
+            // TODO: add log then return u_res err
+            let _push_res_to_queue = self.image_queue.push_process_result(param).await?;
+
+            return Err(e);
+        }
+
+
+        let param = ProcessResultParam {
+            image: param.image,
+            err: None
+        };
         
+        let _push_res_to_queue = self.image_queue.push_process_result(param).await?;
+
         Ok(OptimizeImageResult {})
     }
 

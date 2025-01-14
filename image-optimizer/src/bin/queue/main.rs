@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use serviceorented::{
-    api::queue::nats::QueueConsumer,
+    api::queue::nats::QueueSubscriber,
     app_config::Config,
     infra::queue::nats::{NatsQueue, image_queue::ImageQueueNatsImpl},
     service::{
@@ -42,7 +42,7 @@ fn main() {
             image_queue: Arc::new(image_queue),
         };
 
-        let _ = QueueConsumer::new(
+        let _ = QueueSubscriber::new(
             cnf.image_queue_nats_config,
             client.clone(),
             Arc::new(image_service),
