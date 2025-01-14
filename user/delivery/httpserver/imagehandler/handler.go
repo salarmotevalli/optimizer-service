@@ -1,10 +1,10 @@
 package imagehandler
 
 import (
-	"getway/param/imageparam"
-	"getway/pkg/httpmsg"
-	"getway/service/imageservice"
-	"getway/validator/imagevalidator"
+	"user/param/imageparam"
+	"user/pkg/httpmsg"
+	"user/service/imageservice"
+	"user/validator/imagevalidator"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

@@ -4,8 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
-	"getway/entity"
-	"getway/param/userparam"
+	"user/entity"
+	"user/param/userparam"
 	"fmt"
 	"log"
 )

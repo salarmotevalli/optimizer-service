@@ -3,9 +3,12 @@ type: yml
 auth:
   sign_key: jwt_secret
 
+authorization_config:
+  max_successful_request_per_day: 50
+  max_total_request_per_day: 70
+
 http_server:
   port: 8088
-
 
 optimizer_config:
   url: http://127.0.0.1:5000
@@ -22,13 +25,3 @@ redis:
   host: localhost
   db: 0
   password: ""
-
-matching_service:
-  waiting_timeout: "2m"
-
-presence_service:
-  expiration_time: "60m"
-  prefix: "presence"
-
-scheduler:
-  match_waited_users_interval_in_seconds: 30

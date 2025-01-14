@@ -1,10 +1,10 @@
 package userhandler
 
 import (
-	"getway/param/userparam"
-	"getway/pkg/httpmsg"
-	"getway/service/authservice"
-	"getway/service/userservice"
+	"user/param/userparam"
+	"user/pkg/httpmsg"
+	"user/service/authservice"
+	"user/service/userservice"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

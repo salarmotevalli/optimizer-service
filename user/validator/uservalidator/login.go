@@ -1,9 +1,9 @@
 package uservalidator
 
 import (
-	"getway/param/userparam"
-	"getway/pkg/errmsg"
-	"getway/pkg/richerror"
+	"user/param/userparam"
+	"user/pkg/errmsg"
+	"user/pkg/richerror"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"getway/param/imageparam"
-	"getway/pkg/richerror"
+	"user/param/imageparam"
+	"user/pkg/richerror"
 	"io"
 	"net/http"
 )

@@ -1,6 +1,6 @@
 package uservalidator
 
-import "getway/entity"
+import "user/entity"
 
 type Repository interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)

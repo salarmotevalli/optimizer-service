@@ -1,8 +1,8 @@
 package authservice
 
 import (
-	"getway/entity"
-	"getway/pkg/richerror"
+	"user/entity"
+	"user/pkg/richerror"
 	"strings"
 	"time"
 

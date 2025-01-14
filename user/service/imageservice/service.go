@@ -1,8 +1,8 @@
 package imageservice
 
 import (
-	"getway/param/imageparam"
-	"getway/pkg/richerror"
+	"user/param/imageparam"
+	"user/pkg/richerror"
 )
 
 type ImageRepository interface {

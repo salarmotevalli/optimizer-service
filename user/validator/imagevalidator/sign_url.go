@@ -1,9 +1,9 @@
 package imagevalidator
 
 import (
-	"getway/param/imageparam"
-	"getway/pkg/errmsg"
-	"getway/pkg/richerror"
+	"user/param/imageparam"
+	"user/pkg/errmsg"
+	"user/pkg/richerror"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )

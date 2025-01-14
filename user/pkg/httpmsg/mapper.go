@@ -1,8 +1,8 @@
 package httpmsg
 
 import (
-	// "getway/pkg/errmsg"
-	"getway/pkg/richerror"
+	// "user/pkg/errmsg"
+	"user/pkg/richerror"
 	"net/http"
 )
 

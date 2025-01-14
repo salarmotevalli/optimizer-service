@@ -2,9 +2,9 @@ package mysqluser
 
 import (
 	"database/sql"
-	"getway/entity"
-	"getway/pkg/richerror"
-	"getway/repository/mysql"
+	"user/entity"
+	"user/pkg/richerror"
+	"user/repository/mysql"
 )
 
 type UserRepo struct {
