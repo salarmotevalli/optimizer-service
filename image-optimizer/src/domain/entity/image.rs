@@ -3,10 +3,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Image {
     pub id: u64,
+    pub user_id: u32,
     pub full_name: String,
     pub size: usize,
-    pub width: usize,
-    pub height: usize,
 }
 
 impl Image {

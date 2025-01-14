@@ -60,7 +60,7 @@ async fn upload_image(
     let file_name = form.file.file_name.unwrap();
     let path = format!("{}/{}", container.config.file_temp_dir, file_name);
 
-    let image = entity::image::Image {
+    let mut image = entity::image::Image {
         full_name: file_name,
         size: form.file.size,
         ..Default::default()
@@ -73,12 +73,14 @@ async fn upload_image(
 
     let auth_param = AuthorizeImageUploadParam {
         token: query.token.clone(),
-        image,
+        image: image.clone(),
     };
 
-    let _authorization = container
+    let authorization = container
         .authorization_service
         .authorize_image_upload(auth_param)?;
+
+    image.user_id = authorization.user_id;
 
     let _persist_file = form.file
         .file

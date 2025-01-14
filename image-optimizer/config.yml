@@ -2,7 +2,7 @@ file_temp_dir: "./tmp"
 
 token_service_config:
   secret: "si@goosh-im@ge-optimizer-service"
-  expration_time: 36000
+  expiration_time: 36000
 authorization_service_config:
   ext_white_list:
     - "jpg"

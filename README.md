@@ -3,7 +3,7 @@
 ![Design](./docs/design.svg)
 
 
-1. Getway authorize request with user service
+1. user authorize request with user service
 2. Then send it to opt-svc
 3. opt-svc publish a message into queue
 4. opt-svc worker consume the message and start optimization

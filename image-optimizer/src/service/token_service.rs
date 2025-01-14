@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JwtTokenConfig {
     pub secret: String,
-    pub expration_time: u64,
+    pub expiration_time: u64,
 }
 
 pub struct TokenServiceJWTImpl {
@@ -21,18 +21,20 @@ struct Claims {
     exp: usize,
     size: usize,
     name: String,
+    user_id: u32,
     ext: String,
 }
 
 impl TokenService for TokenServiceJWTImpl {
     fn generate_token(&self, param: GenerateTokenParam) -> DomainResult<GenerateTokenResult> {
         let exp =
-            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() + self.config.expration_time;
+            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() + self.config.expiration_time;
 
         let c = Claims {
             size: param.image_size,
             name: param.image_name,
             ext: param.image_format,
+            user_id: param.user_id,
             exp: exp as usize,
         };
 
@@ -77,6 +79,6 @@ impl TokenService for TokenServiceJWTImpl {
             ));
         }
 
-        DomainResult::Ok(VerifyTokenResult {})
+        DomainResult::Ok(VerifyTokenResult {user_id: token.claims.user_id})
     }
 }

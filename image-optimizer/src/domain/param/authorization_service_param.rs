@@ -7,6 +7,7 @@ pub struct GenerateSignUrlTokenParam {
     pub image_name: String,
     pub image_format: String,
     pub image_size: usize,
+    pub user_id: u32
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -21,6 +22,7 @@ pub struct AuthorizeImageUploadParam {
 
 pub struct AuthorizeImageUploadResult {
     pub authorized: bool,
+    pub user_id: u32
 }
 
 pub struct AuthorizeImageFormatParam {

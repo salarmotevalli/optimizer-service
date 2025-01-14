@@ -7,6 +7,7 @@ pub struct GenerateTokenParam {
     pub image_name: String,
     pub image_format: String,
     pub image_size: usize,
+    pub user_id: u32
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -21,4 +22,6 @@ pub struct VerifyTokenParam {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct VerifyTokenResult {}
+pub struct VerifyTokenResult {
+    pub user_id: u32
+}

@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   caddy:
     image: caddy:2.9.1-alpine
     volumes:
@@ -18,6 +17,8 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    networks:
+      - app
 
   nats: 
     image: "nats:alpine3.21"

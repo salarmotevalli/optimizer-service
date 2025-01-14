@@ -26,6 +26,7 @@ impl AuthorizationService for AuthorizationServiceImpl {
             image_name: param.image_name,
             image_format: param.image_format,
             image_size: param.image_size,
+            user_id: param.user_id
         })?;
 
         DomainResult::Ok(GenerateSignUrlTokenResult { token: token.token })
@@ -35,7 +36,7 @@ impl AuthorizationService for AuthorizationServiceImpl {
         &self,
         param: AuthorizeImageUploadParam,
     ) -> DomainResult<AuthorizeImageUploadResult> {
-        let _is_token_verified = self.token_service.verify_token(VerifyTokenParam {
+        let is_token_verified = self.token_service.verify_token(VerifyTokenParam {
             token: param.token,
             image: param.image.clone(),
         })?;
@@ -44,7 +45,7 @@ impl AuthorizationService for AuthorizationServiceImpl {
             ext: param.image.ext(),
         })?;
 
-        DomainResult::Ok(AuthorizeImageUploadResult { authorized: true })
+        DomainResult::Ok(AuthorizeImageUploadResult { authorized: true, user_id: is_token_verified.user_id})
     }
 
     fn authorize_image_format(

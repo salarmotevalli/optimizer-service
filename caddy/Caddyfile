@@ -11,15 +11,12 @@ localhost {
 }
 
 svc.localhost {
-	reverse_proxy /opt/* 	optimizer:5000
-	
-
-	reverse_proxy /users/* 	user:4000
+	reverse_proxy /opt/upload 	optimizer:5000
+	reverse_proxy /users/* 		user:4000
 }
 
 
 # third parties
-
 minio.localhost {
 	reverse_proxy minio:9001
 }
